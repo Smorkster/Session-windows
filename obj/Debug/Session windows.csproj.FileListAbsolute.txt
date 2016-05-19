@@ -1,0 +1,10 @@
+H:\Session windows\bin\Debug\Session windows.exe.config
+H:\Session windows\bin\Debug\Session windows.exe
+H:\Session windows\bin\Debug\Session windows.pdb
+H:\Session windows\obj\Debug\Session windows.csprojResolveAssemblyReference.cache
+H:\Session windows\obj\Debug\Session_windows.MainForm.resources
+H:\Session windows\obj\Debug\Session windows.csproj.GenerateResource.Cache
+H:\Session windows\obj\Debug\Session windows.exe
+H:\Session windows\obj\Debug\Session windows.pdb
+H:\Session windows\obj\Debug\Session_windows.SessionName.resources
+H:\Session windows\obj\Debug\Session_windows.SelectSession.resources
