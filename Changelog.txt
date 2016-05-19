@@ -20,3 +20,10 @@ Added tooltips for buttons
 Removed button SetSettings
 Moved controls for setting windowlayout to a groupbox
 Now checks if the list of sessions is empty. If so, disable the menuitem for "Marked"
+
+Version 2.0
+***********
+Added setting for starting application in notificationarea or show mainform
+Rewritten logic and extracted the data to object Settings to make coding clearer
+Now only opens the MainForm in one instance
+Added versionnumber to the title of MainForm

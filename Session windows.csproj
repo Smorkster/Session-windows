@@ -68,10 +68,11 @@
       <DependentUpon>SelectSession.cs</DependentUpon>
     </Compile>
     <Compile Include="Session.cs" />
-    <Compile Include="SessionName.cs" />
-    <Compile Include="SessionName.Designer.cs">
-      <DependentUpon>SessionName.cs</DependentUpon>
+    <Compile Include="NewSessionName.cs" />
+    <Compile Include="NewSessionName.Designer.cs">
+      <DependentUpon>NewSessionName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="WindowLayout.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -89,8 +90,8 @@
     <EmbeddedResource Include="SelectSession.resx">
       <DependentUpon>SelectSession.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SessionName.resx">
-      <DependentUpon>SessionName.cs</DependentUpon>
+    <EmbeddedResource Include="NewSessionName.resx">
+      <DependentUpon>NewSessionName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

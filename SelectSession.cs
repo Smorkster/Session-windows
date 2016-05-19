@@ -7,22 +7,21 @@ namespace Session_windows
 {
 	public partial class SelectSession : Form
 	{
-		List<Session> sl = new List<Session>();
-		public SelectSession(List<Session> s)
+		public SelectSession(string[] sessionList)
 		{
 			InitializeComponent();
-			sl = s;
-			foreach (Session si in s) {
-				cbSessionSelect.Items.Add(si.SessionName);
+
+			foreach (string session in sessionList) {
+				cbSessionSelect.Items.Add(session);
 			}
 		}
 		/// <summary>
 		/// Get selected combobox item
 		/// </summary>
 		/// <returns>Item text as string</returns>
-		public Session getSession()
+		public string getName()
 		{
-			return sl.Find(x => x.SessionName.Equals(cbSessionSelect.SelectedItem.ToString()));
+			return cbSessionSelect.SelectedItem.ToString();
 		}
 
 		/// <summary>

@@ -20,23 +20,23 @@ namespace Session_windows
 		/// <summary>
 		/// Collects all process- and sessioninformation to a string and writes to file
 		/// </summary>
-		/// <param name="sL">List of sessions</param>
-		/// <param name = "docked">Information about which session is used for docked/undocked computer</param>
-		public void write(List<Session> sL, string[] docked)
+		/// <param name="settings">All settings for sessions and processes</param>
+		public void write (Settings settings)
 		{
 			string dataText = "";
 			StreamWriter writer;
 
-			foreach (Session s in sL) {
+			for (int i = 0; i < settings.NumberOfSessions; i++) {
+				Session s = settings.getSession(i);
 				foreach (ProcessInfo p in s.Plist) {
 					dataText = dataText + string.Format("<session><sessionname>{0}</sessionname><processname>{1}</processname><winplacement>{2}</winplacement><xcoor>{3}</xcoor><ycoor>{4}</ycoor><xlowcoor>{5}</xlowcoor><ylowcoor>{6}</ylowcoor></session>\r\n",
-						s.SessionName,
-						p.ProcessName,
-						p.Minimized,
-						p.Xcoordinate,
-						p.Ycoordinate,
-						p.Xcoordinatelow,
-						p.Ycoordinatelow);
+					                                    s.SessionName,
+					                                    p.ProcessName,
+					                                    p.Minimized,
+					                                    p.Xcoordinate,
+					                                    p.Ycoordinate,
+					                                    p.Xcoordinatelow,
+					                                    p.Ycoordinatelow);
 				}
 			}
 			try {
@@ -44,8 +44,9 @@ namespace Session_windows
 					writer = new StreamWriter((fi.FullName), false, System.Text.Encoding.UTF8);
 					writer.WriteLine("<?xml version=\"1.0\"?>\r\n<sessions>");
 					writer.Write(dataText);
-					writer.WriteLine("<docked>" + docked[0] + "</docked>");
-					writer.WriteLine("<undocked>" + docked[1] + "</undocked>");
+					writer.WriteLine("<docked>" + settings.Docked + "</docked>");
+					writer.WriteLine("<undocked>" + settings.Undocked + "</undocked>");
+					writer.WriteLine("<start>" + (settings.StartInSysTray ? "true" : "false") + "</start>");
 					writer.WriteLine("</sessions>");
 					writer.Flush();
 					writer.Close();
@@ -61,7 +62,7 @@ namespace Session_windows
 		/// Read the XML-file and sort the processes per session
 		/// </summary>
 		/// <returns>List of sessions with processes</returns>
-		public List<Session> read()
+		public List<Session> read (string Caller)
 		{
 			XmlTextReader xRead = new XmlTextReader(@"H:\WindowSession.xml");
 
@@ -103,14 +104,14 @@ namespace Session_windows
 						int ylc = int.Parse(ylowcoor[i].InnerText);
 						int wp = int.Parse(winplacement[i].InnerText);
 						ProcessInfo pi = new ProcessInfo(h,
-							                 id,
-							                 n,
-							                 wt,
-							                 xc,
-							                 yx,
-							                 xlc,
-							                 ylc,
-							                 wp);
+						                                 id,
+						                                 n,
+						                                 wt,
+						                                 xc,
+						                                 yx,
+						                                 xlc,
+						                                 ylc,
+						                                 wp);
 						int sessionindex = slist.FindIndex(x => x.SessionName.Equals(sessionname[i].InnerText));
 						if (sessionindex == -1) {
 							List<ProcessInfo> p = new List<ProcessInfo>();
@@ -124,15 +125,19 @@ namespace Session_windows
 					}
 					return slist;
 				} catch (Exception e) {
-					MessageBox.Show("Something wrong when reading XML:\n" + e.Message, "");
+					MessageBox.Show("Something wrong when reading XML (" + Caller + "):\n" + e.Message, "");
 					xRead.Close();
 				}
 			}
 
 			return null;
 		}
-		
-		public string[] getDockedSessions()
+
+		/// <summary>
+		/// Read XML-elements for what sessions is specified to be used when computer is docked vs. undocked
+		/// </summary>
+		/// <returns>Two set stringarray of the sessionnames</returns>
+		public string[] getDockedSessions ()
 		{
 			string[] specifiedSessions = new string[2];
 			XmlTextReader xRead = new XmlTextReader(@"H:\WindowSession.xml");
@@ -155,11 +160,39 @@ namespace Session_windows
 		}
 
 		/// <summary>
+		/// Read XML-file for the the setting if the application is to be started in
+		/// notificationarean or with form shown
+		/// </summary>
+		/// <returns>True if started in notificationarea</returns>
+		public bool getStart ()
+		{
+			XmlTextReader xRead = new XmlTextReader(@"H:\WindowSession.xml");
+
+			try {
+				doc.Load(xRead);
+
+				XmlNodeList start = doc.GetElementsByTagName("start");
+				xRead.Close();
+
+				if (start.Count <= 0)
+					return false;
+
+				var temp = start[0].InnerText;
+				return start[0].InnerText.Equals("true");
+			} catch (Exception e) {
+				MessageBox.Show("Something wrong when reading XML:\n" + e.Message, "");
+				xRead.Close();
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Checks if a file is locked in any way or not
 		/// </summary>
 		/// <param name="file">File to be checked</param>
 		/// <returns>True if file is locked, otherwise false</returns>
-		bool IsFileLocked(FileInfo file)
+		bool IsFileLocked (FileInfo file)
 		{
 			FileStream stream = null;
 

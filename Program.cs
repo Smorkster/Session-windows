@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
+using System.Xml;
 using Microsoft.Win32;
 
 namespace Session_windows
@@ -10,7 +12,8 @@ namespace Session_windows
 	static class Program
 	{
 		static NotifyIcon icon;
-		static List<Session> sessions;
+		static Settings settings = new Settings();
+		static Form m = null;
 
 		[STAThread]
 		static void Main()
@@ -30,28 +33,45 @@ namespace Session_windows
 					new ToolStripMenuItem("Exit", null, (s, e) => Application.Exit()),
 				});
 				SystemEvents.DisplaySettingsChanged += screensizeChanged;
+				if (!settings.StartInSysTray) {
+					m = new MainForm(ref settings);
+					m.Show();
+				}
 				Application.Run();
 				icon.Visible = false;
 			}
 		}
 
 		/// <summary>
-		/// Read XML-file, gather all sessions and return as list
+		/// Read XML-file, gather all sessions and add them as menuitems for the notifyicon
 		/// </summary>
-		/// <returns>List of all sessions saved</returns>
-		static List<Session> readFile()
+		static void readFile()
 		{
 			FileHandler fl = new FileHandler();
-			sessions = new List<Session>();
-			sessions = fl.read();
-			ToolStripMenuItem sessionMenu = new ToolStripMenuItem("Sessions >");
 
-			for (int i = 0; i < sessions.Count; i++) {
-				sessionMenu.DropDownItems.Add(new ToolStripMenuItem(sessions[i].SessionName, null, sessionSelected));
+			if (File.Exists(@"H:\WindowSession.xml")) {
+				try {
+					foreach(Session s in fl.read("Program.readFile"))
+					{
+						settings.addSession(s);
+					}
+
+					settings.Docked = fl.getDockedSessions()[0];
+					settings.Undocked = fl.getDockedSessions()[1];
+					settings.StartInSysTray = fl.getStart();
+					ToolStripMenuItem sessionMenu = new ToolStripMenuItem("Sessions >");
+
+					for (int i = 0; i < settings.NumberOfSessions; i++) {
+						sessionMenu.DropDownItems.Add(new ToolStripMenuItem(settings.getSession(i).SessionName, null, sessionSelected));
+					}
+					icon.ContextMenuStrip.Items.Add(sessionMenu);
+				} catch (XmlException e) {
+					MessageBox.Show("Error while reading XML-file:\nAt: " + e.LineNumber + "\n\n" + e.Message, "");
+				}
+			} else {
+				MessageBox.Show("WindowSession.xml was not found", "");
+				
 			}
-			icon.ContextMenuStrip.Items.Add(sessionMenu);
-
-			return sessions;
 		}
 
 		/// <summary>
@@ -59,8 +79,13 @@ namespace Session_windows
 		/// </summary>
 		static void menuShow_Click(object sender, EventArgs e)
 		{
-			Form m = new MainForm(sessions);
-			m.Show();
+			if (m != null)
+				m.BringToFront();
+			else
+			{
+				m = new MainForm(ref settings);
+				m.Show();
+			}
 		}
 
 		/// <summary>
@@ -72,7 +97,7 @@ namespace Session_windows
 		static void sessionSelected(object sender, EventArgs e)
 		{
 			string name = (sender as ToolStripMenuItem).Text;
-			Session session = sessions.Find(x => x.SessionName.Equals(name));
+			Session session = settings.getSession(name);
 
 			foreach (ProcessInfo pi in session.Plist) {
 				new WindowLayout().setLayout(pi);
@@ -86,8 +111,13 @@ namespace Session_windows
 		/// <param name="e">Generic Eventargs</param>
 		static void doubleClick(object sender, EventArgs e)
 		{
-			Form m = new MainForm(sessions);
-			m.Show();
+			if (m != null)
+				m.BringToFront();
+			else
+			{
+				m = new MainForm(ref settings);
+				m.Show();
+			}
 		}
 
 		/// <summary>
@@ -99,12 +129,15 @@ namespace Session_windows
 		static void screensizeChanged(object sender, EventArgs e)
 		{
 			FileHandler fl = new FileHandler();
-			int dockedStatus;
-			Session dockedSession;
+			Session session = new Session();
 
-			dockedStatus = Screen.AllScreens.Length == 1 ? 1 : 0;
-			dockedSession = sessions.Find(x => x.SessionName.Equals(fl.getDockedSessions()[dockedStatus]));
-			foreach (ProcessInfo process in dockedSession.Plist) {
+			if (Screen.AllScreens.Length == 1)
+			{
+				session = settings.getSession(settings.Undocked);
+			} else {
+				session = settings.getSession(settings.Docked);
+			}
+			foreach (ProcessInfo process in session.Plist) {
 				new WindowLayout().setLayout(process);
 			}
 		}

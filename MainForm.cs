@@ -11,18 +11,11 @@ namespace Session_windows
 	public partial class MainForm : Form
 	{
 		[DllImport("user32.dll", SetLastError = true)]
-		static extern bool GetWindowRect(IntPtr hWnd, ref RECT Rect);
-
-		[DllImport("user32.dll", SetLastError = true)]
-		static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int Width, int Height, bool Repaint);
+		static extern bool GetWindowRect (IntPtr hWnd, ref RECT Rect);
 
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-		
-		[DllImport("user32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+		internal static extern bool GetWindowPlacement (IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
 		/// <summary>
 		/// Enumeration of available windowcommands for WINDOWPLACEMENT
@@ -64,43 +57,38 @@ namespace Session_windows
 			public int bottom;
 		}
 
-		List<ProcessInfo> pList;
-		List<Session> sList;
-		IEnumerable<Process> processes;
-		int currentSessionIndex, currentProcessIndex;
+		IEnumerable<Process> activeProcesses;
 		ProcessInfo currentProcess;
-		FileHandler fh;
-		string[] dockedSession;
+		Settings settings;
 
 		/// <summary>
 		/// Entrypoint of mainform, called from systrayicon
 		/// Fill listbox of sessions from data in the XML-file
 		/// </summary>
-		/// <param name="l">List of processessions</param>
-		public MainForm(List<Session> l)
+		/// <param name="settings">All settings read from XML-file</param>
+		public MainForm(ref Settings s)
 		{
 			InitializeComponent();
-
+			this.settings = s;
 			lbProcesses.SelectedIndexChanged -= lbProcesses_SelectedIndexChanged;
-			fh = new FileHandler();
-			sList = l;
-			dockedSession = fh.getDockedSessions();
 			populateSessions();
+			checkboxStart.Checked = settings.StartInSysTray;
 			lbProcesses.SelectedIndexChanged += lbProcesses_SelectedIndexChanged;
+			Text = "Session window version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 		}
 
 		/// <summary>
 		/// Take data from current processlist and fill the listbox
 		/// If processlist is empty (pList), create list from currently running processes
 		/// </summary>
-		public void populateProcesses()
+		public void populateProcesses ()
 		{
-			if (pList == null) {
-				processes = Process.GetProcesses().Where(p => p.MainWindowHandle != IntPtr.Zero &&
+			if (settings.currentProcessesList == null) {
+				activeProcesses = Process.GetProcesses().Where(p => p.MainWindowHandle != IntPtr.Zero &&
 				p.ProcessName != "iexplore" &&
 				p.Id != Process.GetCurrentProcess().Id);
-				pList = new List<ProcessInfo>();
-				foreach (Process p in processes) {
+				settings.currentProcessesList = new List<ProcessInfo>();
+				foreach (Process p in activeProcesses) {
 					IntPtr handle = p.MainWindowHandle;
 					WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
 					placement.length = Marshal.SizeOf(placement);
@@ -117,88 +105,88 @@ namespace Session_windows
 						int r = Rect.right;
 						int b = Rect.bottom;
 						int pl = (int)placement.showCmd;
-						pList.Add(new ProcessInfo(h, i, pn, mwt, l, t, r, b, pl));
+						settings.currentProcessesList.Add(new ProcessInfo(h, i, pn, mwt, l, t, r, b, pl));
 						lbProcesses.Items.Add(p.ProcessName);
 					}
 				}
 			} else {
-				foreach (ProcessInfo item in pList) {
+				foreach (ProcessInfo item in settings.currentProcessesList) {
 					lbProcesses.Items.Add(item.ProcessName);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Fill the listbox for sessions from data in XML-file
+		/// Fill the listbox for sessions
 		/// </summary>
-		void populateSessions()
+		void populateSessions ()
 		{
-			if (sList != null) {
+			string[] sessionList = settings.getSessionList();
+			if (sessionList != null) {
 				off();
-				foreach (Session s in sList) {
-					lbSessions.Items.Add(s.SessionName);
+				foreach (string s in sessionList) {
+					lbSessions.Items.Add(s);
 				}
 				populateDockedLists();
 
-				if (dockedSession != null) {
-					if (dockedSession[0].Equals(dockedSession[1])) {
-						cbUndocked.SelectedIndex = cbDocked.SelectedIndex = cbDocked.FindStringExact(dockedSession[0]);
-					} else if (dockedSession.Equals("")) {
-						cbUndocked.SelectedIndex = cbDocked.SelectedIndex = -1;
+				string temp = settings.Docked;
+				if (!string.IsNullOrEmpty(temp)) {
+					if (settings.Docked.Equals(settings.Undocked)) {
+						comboboxUndocked.SelectedIndex = comboboxDocked.SelectedIndex = comboboxDocked.FindStringExact(settings.Docked);
+					} else if (settings.Docked.Equals("")) {
+						comboboxUndocked.SelectedIndex = comboboxDocked.SelectedIndex = -1;
 					} else {
-						cbUndocked.SelectedIndex = cbUndocked.FindStringExact(dockedSession[1]);
-						cbDocked.SelectedIndex = cbDocked.FindStringExact(dockedSession[0]);
+						comboboxUndocked.SelectedIndex = comboboxUndocked.FindStringExact(settings.Undocked);
+						comboboxDocked.SelectedIndex = comboboxDocked.FindStringExact(settings.Docked);
 					}
 				}
 				on();
 			}
 		}
 
-		void populateDockedLists()
+		void populateDockedLists ()
 		{
-			if (sList != null) {
-				cbUndocked.Items.Clear();
-				cbDocked.Items.Clear();
-				foreach (Session s in sList) {
-					cbDocked.Items.Add(s.SessionName);
-					cbUndocked.Items.Add(s.SessionName);
-				}
+			comboboxUndocked.Items.Clear();
+			comboboxDocked.Items.Clear();
+			foreach (string s in settings.getSessionList()) {
+				comboboxDocked.Items.Add(s);
+				comboboxUndocked.Items.Add(s);
 			}
 		}
 
 		/// <summary>
 		/// Turn on the eventhandlers to enable messages being shown 
 		/// </summary>
-		void on()
+		void on ()
 		{
 			txtX.TextChanged += txtX_TextChanged;
 			txtY.TextChanged += txtY_TextChanged;
 			txtWidth.TextChanged += txtWidth_TextChanged;
 			txtHeight.TextChanged += txtHeight_TextChanged;
-			cbMinimized.SelectedIndexChanged += cbMinimized_SelectedIndexChanged;
-			cbDocked.SelectedIndexChanged += cbDocked_SelectedIndexChanged;
-			cbUndocked.SelectedIndexChanged += cbUndocked_SelectedIndexChanged;
+			comboboxMinimized.SelectedIndexChanged += comboboxMinimized_SelectedIndexChanged;
+			comboboxDocked.SelectedIndexChanged += comboboxDocked_SelectedIndexChanged;
+			comboboxUndocked.SelectedIndexChanged += comboboxUndocked_SelectedIndexChanged;
 		}
 
 		/// <summary>
 		/// Turn off eventhandlers to avoid messages from being shown unnecessarily
 		/// </summary>
-		void off()
+		void off ()
 		{
 			txtX.TextChanged -= txtX_TextChanged;
 			txtY.TextChanged -= txtY_TextChanged;
 			txtWidth.TextChanged -= txtWidth_TextChanged;
 			txtHeight.TextChanged -= txtHeight_TextChanged;
-			cbMinimized.SelectedIndexChanged -= cbMinimized_SelectedIndexChanged;
-			cbDocked.SelectedIndexChanged -= cbDocked_SelectedIndexChanged;
-			cbUndocked.SelectedIndexChanged -= cbUndocked_SelectedIndexChanged;
+			comboboxMinimized.SelectedIndexChanged -= comboboxMinimized_SelectedIndexChanged;
+			comboboxDocked.SelectedIndexChanged -= comboboxDocked_SelectedIndexChanged;
+			comboboxUndocked.SelectedIndexChanged -= comboboxUndocked_SelectedIndexChanged;
 		}
 
 		/// <summary>
 		/// Remove information of process
 		/// Called after click in listbox where no listboxitem is located
 		/// </summary>
-		void clearTextBoxes()
+		void clearTextBoxes ()
 		{
 			txtHeight.Text = "";
 			txtWidth.Text = "";
@@ -206,14 +194,14 @@ namespace Session_windows
 			txtY.Text = "";
 			txtProcess.Text = "";
 			txtId.Text = "";
-			cbMinimized.SelectedIndex = -1;
+			comboboxMinimized.SelectedIndex = -1;
 		}
 
 		/// <summary>
 		/// Apply new windowlayout of specified process
 		/// </summary>
 		/// <param name="process">Process specified with layoutinfo</param>
-		void redrawWindows(ProcessInfo process)
+		void redrawWindows (ProcessInfo process)
 		{
 			if (process != null) {
 				new WindowLayout().setLayout(process);
@@ -225,12 +213,12 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnGetProcesses_Click(object sender, EventArgs e)
+		void btnGetProcesses_Click (object sender, EventArgs e)
 		{
 			off();
 			clearTextBoxes();
 			lbProcesses.Items.Clear();
-			pList = null;
+			settings.currentProcessesList = null;
 			currentProcess = null;
 			populateProcesses();
 			on();
@@ -242,46 +230,29 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnSetProcessInfo_Click(object sender, EventArgs e)
+		void btnSetProcessInfo_Click (object sender, EventArgs e)
 		{
-			int processIndex, sessionIndex;
 			currentProcess.Height = int.Parse(txtHeight.Text);
 			currentProcess.Width = int.Parse(txtWidth.Text);
 			currentProcess.ProcessName = txtProcess.Text;
 			currentProcess.Xcoordinate = int.Parse(txtX.Text);
 			currentProcess.Ycoordinate = int.Parse(txtY.Text);
-			currentProcess.Minimized = cbMinimized.SelectedIndex + 1;
+			currentProcess.Minimized = comboboxMinimized.SelectedIndex + 1;
 
-			if (sList != null && lbSessions.SelectedIndex != -1) {
-				sessionIndex = sList.FindIndex(x => x.SessionName.Equals(lbSessions.SelectedItem));
-				processIndex = sList[sessionIndex].Plist.FindIndex(x => x.ID == int.Parse(txtId.Text));
-				if (processIndex != -1) {
-					sList[sessionIndex].Plist[processIndex].Height = currentProcess.Height;
-					sList[sessionIndex].Plist[processIndex].Width = currentProcess.Width;
-					sList[sessionIndex].Plist[processIndex].ProcessName = currentProcess.ProcessName;
-					sList[sessionIndex].Plist[processIndex].Xcoordinate = currentProcess.Xcoordinate;
-					sList[sessionIndex].Plist[processIndex].Ycoordinate = currentProcess.Ycoordinate;
-					sList[sessionIndex].Plist[processIndex].Minimized = currentProcess.Minimized;
-				} else {
-					ProcessInfo pInfo = new ProcessInfo(Process.GetProcessById(currentProcess.ID).MainWindowHandle,
-						                    currentProcess.ID,
-						                    currentProcess.ProcessName,
-						                    currentProcess.MainWindowTitle,
-						                    currentProcess.Xcoordinate,
-						                    currentProcess.Ycoordinate,
-						                    currentProcess.Xcoordinatelow,
-						                    currentProcess.Ycoordinatelow,
-						                    currentProcess.Minimized);
-					sList[sessionIndex].Plist.Add(pInfo);
+			if (settings.currentSession != null && lbSessions.SelectedIndex != -1) {
+				ProcessInfo tempProcess = new ProcessInfo(Process.GetProcessById(currentProcess.ID).MainWindowHandle,
+				                                          currentProcess.ID,
+				                                          currentProcess.ProcessName,
+				                                          currentProcess.MainWindowTitle,
+				                                          currentProcess.Xcoordinate,
+				                                          currentProcess.Ycoordinate,
+				                                          currentProcess.Xcoordinatelow,
+				                                          currentProcess.Ycoordinatelow,
+				                                          currentProcess.Minimized);
+				if (!settings.updateProcess(currentProcess.ProcessName, tempProcess)) {
+					settings.addProcessToSession(lbSessions.SelectedItem.ToString(), tempProcess);
 				}
 			}
-			processIndex = pList.FindIndex(x => x.ID == currentProcess.ID);
-			pList[processIndex].Height = currentProcess.Height;
-			pList[processIndex].Width = currentProcess.Width;
-			pList[processIndex].ProcessName = currentProcess.ProcessName;
-			pList[processIndex].Xcoordinate = currentProcess.Xcoordinate;
-			pList[processIndex].Minimized = currentProcess.Minimized;
-			pList[processIndex].Ycoordinate = currentProcess.Ycoordinate;
 
 			redrawWindows(currentProcess);
 		}
@@ -291,7 +262,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		void btnSave_Click(object sender, EventArgs e)
+		void btnSave_Click (object sender, EventArgs e)
 		{
 			conmenuSave.Show(btnSave, 80, 23);
 		}
@@ -301,9 +272,9 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnSetSettings_Click(object sender, EventArgs e)
+		void btnSetSettings_Click (object sender, EventArgs e)
 		{
-			foreach (ProcessInfo p in pList) {
+			foreach (ProcessInfo p in settings.currentProcessesList) {
 				redrawWindows(p);
 			}
 		}
@@ -314,16 +285,14 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void lbSessions_SelectedIndexChanged(object sender, EventArgs e)
+		void lbSessions_SelectedIndexChanged (object sender, EventArgs e)
 		{
 			if (lbSessions.SelectedIndex != -1) {
-				currentSessionIndex = sList.FindIndex(x => x.SessionName.Equals(lbSessions.SelectedItem.ToString()));
-				currentProcessIndex = -1;
+				settings.setCurrentSession(lbSessions.SelectedItem.ToString());
 				clearTextBoxes();
 				lbProcesses.Items.Clear();
-				currentProcess = null;
-
-				pList = new Session(sList.Find(x => x.SessionName.Equals(lbSessions.SelectedItem.ToString()))).Plist;
+				settings.currentProcessesList = null;
+				settings.currentProcessesList = settings.currentSession.Plist;
 				populateProcesses();
 			}
 		}
@@ -336,15 +305,15 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void lbProcesses_SelectedIndexChanged(object sender, EventArgs e)
+		void lbProcesses_SelectedIndexChanged (object sender, EventArgs e)
 		{
 			if (lbProcesses.SelectedIndex == -1) {
 				currentProcess = null;
 			} else if (!lbProcesses.SelectedItem.ToString().StartsWith("   ")) {
 				ttInfo.Active = false;
-				currentProcess = pList.Find(x => x.ProcessName.Equals(lbProcesses.SelectedItem.ToString()));
-				currentProcessIndex = pList.FindIndex(x => x.ProcessName.Equals(lbProcesses.SelectedItem.ToString()));
+				currentProcess = settings.currentProcessesList.Find(x => x.ProcessName.Equals(lbProcesses.SelectedItem.ToString()));
 				off();
+
 				if (currentProcess.ID == 0) {
 					txtProcess.Text = currentProcess.ProcessName;
 					txtId.Text = "No process for " + currentProcess.ProcessName + " is running";
@@ -352,7 +321,7 @@ namespace Session_windows
 					txtY.ReadOnly = true;
 					txtHeight.ReadOnly = true;
 					txtWidth.ReadOnly = true;
-					cbMinimized.Enabled = false;
+					comboboxMinimized.Enabled = false;
 				} else {
 					txtX.Text = currentProcess.Xcoordinate.ToString();
 					txtX.ReadOnly = false;
@@ -366,16 +335,16 @@ namespace Session_windows
 					txtId.Text = currentProcess.ID.ToString();
 					switch (currentProcess.Minimized) {
 						case 3:
-							cbMinimized.SelectedIndex = 2;
+							comboboxMinimized.SelectedIndex = 2;
 							break;
 						case 2:
-							cbMinimized.SelectedIndex = 1;
+							comboboxMinimized.SelectedIndex = 1;
 							break;
 						default:
-							cbMinimized.SelectedIndex = 0;
+							comboboxMinimized.SelectedIndex = 0;
 							break;
 					}
-					cbMinimized.Enabled = true;
+					comboboxMinimized.Enabled = true;
 				}
 				on();
 			}
@@ -386,10 +355,10 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic MouseEventArgs</param>
-		void lbProcesses_MouseDown(object sender, MouseEventArgs e)
+		void lbProcesses_MouseDown (object sender, MouseEventArgs e)
 		{
 			int index = lbProcesses.IndexFromPoint(e.Location);
-			
+
 			if (index == -1) {
 				lbProcesses.SelectedIndex = -1;
 				off();
@@ -410,7 +379,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void txtX_TextChanged(object sender, EventArgs e)
+		void txtX_TextChanged (object sender, EventArgs e)
 		{
 			if (currentProcess != null) {
 				if (txtX.Text.Length == 0)
@@ -428,7 +397,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void txtY_TextChanged(object sender, EventArgs e)
+		void txtY_TextChanged (object sender, EventArgs e)
 		{
 			if (currentProcess != null) {
 				if (txtY.Text.Length == 0)
@@ -445,7 +414,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void txtWidth_TextChanged(object sender, EventArgs e)
+		void txtWidth_TextChanged (object sender, EventArgs e)
 		{
 			if (currentProcess != null) {
 				if (txtWidth.Text.Length == 0 || int.Parse(txtWidth.Text) == 0) {
@@ -463,7 +432,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void txtHeight_TextChanged(object sender, EventArgs e)
+		void txtHeight_TextChanged (object sender, EventArgs e)
 		{
 			if (currentProcess != null) {
 				if (txtHeight.Text.Length == 0) {
@@ -481,50 +450,41 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void conmenuNew_Click(object sender, EventArgs e)
+		void contextmenuSaveNewSession_Click (object sender, EventArgs e)
 		{
-			SessionName sn = new SessionName();
+			NewSessionName newsession = new NewSessionName();
 
-			sn.ShowDialog();
-			if (sn.DialogResult == DialogResult.OK) {
-				if (sList == null)
-					sList = new List<Session>();
-				sList.Add(new Session(sn.getName(), pList));
-				lbSessions.Items.Add(sn.getName());
-				cbUndocked.Items.Add(sn.getName());
-				cbDocked.Items.Add(sn.getName());
+			newsession.ShowDialog();
+			if (newsession.DialogResult == DialogResult.OK) {
+				settings.addSession(new Session(newsession.getName(), settings.currentProcessesList));
+
+				lbSessions.Items.Add(newsession.getName());
+				comboboxUndocked.Items.Add(newsession.getName());
+				comboboxDocked.Items.Add(newsession.getName());
+				settings.currentSession = settings.getSession(newsession.getName());
+				lbSessions.SelectedIndex = lbSessions.FindString(newsession.getName());
 			}
-			fh.write(sList, dockedSession);
+			new FileHandler().write(settings);
 		}
 
 		/// <summary>
 		/// User wants to save the current session
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		void conmenuMarked_Click(object sender, EventArgs e)
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void contextmenuSaveMarkedSession_Click (object sender, EventArgs e)
 		{
-			Session sessionName;
-			SelectSession userSpecifiedSession = new SelectSession(sList);
-			
-			if (lbSessions.SelectedItem.ToString().Equals("")) {
-				userSpecifiedSession.ShowDialog();
-				sessionName = userSpecifiedSession.getSession();
-			} else
-				sessionName = sList.Find(x => x.SessionName.Equals(lbSessions.SelectedItem.ToString()));
-			int i = sList.IndexOf(sessionName);
-			sList[i].Plist = pList;
-			fh.write(sList, dockedSession);
+			settings.updateSession();
+			new FileHandler().write(settings);
 		}
 
-		void conmenuDelete_Click(object sender, EventArgs e)
+		void contextmenuDeleteProcess_Click (object sender, EventArgs e)
 		{
-			int processIndex = pList.FindIndex(x => x.ID == int.Parse(txtId.Text));
-
-			pList.RemoveAt(processIndex);
-			processIndex = sList[currentSessionIndex].Plist.FindIndex(x => x.ID == int.Parse(txtId.Text));
-			sList[currentSessionIndex].Plist.RemoveAt(processIndex);
-			populateSessions();
+			settings.deleteProcessFromSession(settings.currentSession.SessionName, currentProcess);
+			settings.currentSession = settings.getSession(settings.currentSession.SessionName);
+			settings.currentProcessesList = settings.currentSession.Plist;
+			populateProcesses();
+			new FileHandler().write(settings);
 		}
 
 		/// <summary>
@@ -532,9 +492,11 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void cbMinimized_SelectedIndexChanged(object sender, EventArgs e)
+		void comboboxMinimized_SelectedIndexChanged (object sender, EventArgs e)
 		{
-			currentProcess.Minimized = cbMinimized.SelectedIndex;
+			currentProcess.Minimized = comboboxMinimized.SelectedIndex;
+			settings.updateProcess(currentProcess.ProcessName, currentProcess);
+			new FileHandler().write(settings);
 		}
 
 		/// <summary>
@@ -542,9 +504,9 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void cbMinimized_Click(object sender, EventArgs e)
+		void comboboxMinimized_Click (object sender, EventArgs e)
 		{
-			cbMinimized.DroppedDown = true;
+			comboboxMinimized.DroppedDown = true;
 		}
 
 		/// <summary>
@@ -553,10 +515,10 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void cbDocked_SelectedIndexChanged(object sender, EventArgs e)
+		void comboboxDocked_SelectedIndexChanged (object sender, EventArgs e)
 		{
-			dockedSession[0] = cbDocked.SelectedItem.ToString();
-			fh.write(sList, dockedSession);
+			settings.Docked = comboboxDocked.SelectedItem.ToString();
+			new FileHandler().write(settings);
 		}
 
 		/// <summary>
@@ -565,10 +527,10 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void cbUndocked_SelectedIndexChanged(object sender, EventArgs e)
+		void comboboxUndocked_SelectedIndexChanged (object sender, EventArgs e)
 		{
-			dockedSession[1] = cbUndocked.SelectedItem.ToString();
-			fh.write(sList, dockedSession);
+			settings.Undocked = comboboxUndocked.SelectedItem.ToString();
+			new FileHandler().write(settings);
 		}
 
 		/// <summary>
@@ -576,7 +538,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void txtCoordinate_MouseHover(object sender, EventArgs e)
+		void txtCoordinate_MouseHover (object sender, EventArgs e)
 		{
 			ttInfo.Active = true;
 			ttInfo.Show("Coordinate of the upper left cornet", (TextBox)sender, 0, 18);
@@ -587,7 +549,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnGetProcesses_MouseHover(object sender, EventArgs e)
+		void btnGetProcesses_MouseHover (object sender, EventArgs e)
 		{
 			ttInfo.Active = true;
 			ttInfo.Show("List processes with open, visible windows.", (Button)sender, 0, 18);
@@ -598,7 +560,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnSave_MouseHover(object sender, EventArgs e)
+		void btnSave_MouseHover (object sender, EventArgs e)
 		{
 			ttInfo.Active = true;
 			ttInfo.Show("Save the current settings for visible windows.\nAs new or as the currently marked session.", (Button)sender, 0, 18);
@@ -607,12 +569,23 @@ namespace Session_windows
 		/// <summary>
 		/// Check if the list of sessions is empty. If so, disable menuitem for "Marked" 
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		void conmenuSave_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic CancelEventArgs</param>
+		void contextmenuSave_Opening (object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			if (lbSessions.Items.Count == 0)
 				conmenuSave.Items[1].Enabled = false;
+		}
+
+		/// <summary>
+		/// User wants the application to start minimized to the notificationarea
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void checkboxStart_CheckedChanged (object sender, EventArgs e)
+		{
+			settings.StartInSysTray = checkboxStart.Checked;
+			new FileHandler().write(settings);
 		}
 	}
 }

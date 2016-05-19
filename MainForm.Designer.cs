@@ -26,19 +26,19 @@ namespace Session_windows
 		private System.Windows.Forms.ContextMenuStrip conmenuSave;
 		private System.Windows.Forms.ToolStripMenuItem conmenuNew;
 		private System.Windows.Forms.ToolStripMenuItem conmenuMarked;
-		private System.Windows.Forms.ComboBox cbMinimized;
+		private System.Windows.Forms.ComboBox comboboxMinimized;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.ContextMenuStrip conmenuDeleteProcess;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.Label label9;
-		private System.Windows.Forms.ComboBox cbDocked;
-		private System.Windows.Forms.ComboBox cbUndocked;
+		private System.Windows.Forms.ComboBox comboboxDocked;
+		private System.Windows.Forms.ComboBox comboboxUndocked;
 		private System.Windows.Forms.ToolStripMenuItem conmenuDelete;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
-		private System.Windows.Forms.CheckBox checkBox1;
+		private System.Windows.Forms.CheckBox checkboxStart;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -81,7 +81,7 @@ namespace Session_windows
 			this.conmenuMarked = new System.Windows.Forms.ToolStripMenuItem();
 			this.txtId = new System.Windows.Forms.TextBox();
 			this.lbSessions = new System.Windows.Forms.ListBox();
-			this.cbMinimized = new System.Windows.Forms.ComboBox();
+			this.comboboxMinimized = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
@@ -89,11 +89,11 @@ namespace Session_windows
 			this.conmenuDelete = new System.Windows.Forms.ToolStripMenuItem();
 			this.label8 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
-			this.cbDocked = new System.Windows.Forms.ComboBox();
-			this.cbUndocked = new System.Windows.Forms.ComboBox();
+			this.comboboxDocked = new System.Windows.Forms.ComboBox();
+			this.comboboxUndocked = new System.Windows.Forms.ComboBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.checkBox1 = new System.Windows.Forms.CheckBox();
+			this.checkboxStart = new System.Windows.Forms.CheckBox();
 			this.conmenuSave.SuspendLayout();
 			this.conmenuDeleteProcess.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -125,9 +125,9 @@ namespace Session_windows
 			// 
 			// btnSetProcessInfo
 			// 
-			this.btnSetProcessInfo.Location = new System.Drawing.Point(151, 144);
+			this.btnSetProcessInfo.Location = new System.Drawing.Point(191, 144);
 			this.btnSetProcessInfo.Name = "btnSetProcessInfo";
-			this.btnSetProcessInfo.Size = new System.Drawing.Size(86, 23);
+			this.btnSetProcessInfo.Size = new System.Drawing.Size(46, 23);
 			this.btnSetProcessInfo.TabIndex = 2;
 			this.btnSetProcessInfo.Text = "Set";
 			this.btnSetProcessInfo.UseVisualStyleBackColor = true;
@@ -237,21 +237,21 @@ namespace Session_windows
 			this.conmenuMarked});
 			this.conmenuSave.Name = "cmenuSave";
 			this.conmenuSave.Size = new System.Drawing.Size(115, 48);
-			this.conmenuSave.Opening += new System.ComponentModel.CancelEventHandler(this.conmenuSave_Opening);
+			this.conmenuSave.Opening += new System.ComponentModel.CancelEventHandler(this.contextmenuSave_Opening);
 			// 
 			// conmenuNew
 			// 
 			this.conmenuNew.Name = "conmenuNew";
 			this.conmenuNew.Size = new System.Drawing.Size(114, 22);
 			this.conmenuNew.Text = "New";
-			this.conmenuNew.Click += new System.EventHandler(this.conmenuNew_Click);
+			this.conmenuNew.Click += new System.EventHandler(this.contextmenuSaveNewSession_Click);
 			// 
 			// conmenuMarked
 			// 
 			this.conmenuMarked.Name = "conmenuMarked";
 			this.conmenuMarked.Size = new System.Drawing.Size(114, 22);
 			this.conmenuMarked.Text = "Marked";
-			this.conmenuMarked.Click += new System.EventHandler(this.conmenuMarked_Click);
+			this.conmenuMarked.Click += new System.EventHandler(this.contextmenuSaveMarkedSession_Click);
 			// 
 			// txtId
 			// 
@@ -270,19 +270,19 @@ namespace Session_windows
 			this.lbSessions.TabIndex = 15;
 			this.lbSessions.SelectedIndexChanged += new System.EventHandler(this.lbSessions_SelectedIndexChanged);
 			// 
-			// cbMinimized
+			// comboboxMinimized
 			// 
-			this.cbMinimized.FormattingEnabled = true;
-			this.cbMinimized.Items.AddRange(new object[] {
+			this.comboboxMinimized.FormattingEnabled = true;
+			this.comboboxMinimized.Items.AddRange(new object[] {
 			"Normal",
 			"Minimized",
 			"Maximized"});
-			this.cbMinimized.Location = new System.Drawing.Point(6, 41);
-			this.cbMinimized.Name = "cbMinimized";
-			this.cbMinimized.Size = new System.Drawing.Size(231, 21);
-			this.cbMinimized.TabIndex = 17;
-			this.cbMinimized.SelectedIndexChanged += new System.EventHandler(this.cbMinimized_SelectedIndexChanged);
-			this.cbMinimized.Click += new System.EventHandler(this.cbMinimized_Click);
+			this.comboboxMinimized.Location = new System.Drawing.Point(6, 41);
+			this.comboboxMinimized.Name = "comboboxMinimized";
+			this.comboboxMinimized.Size = new System.Drawing.Size(231, 21);
+			this.comboboxMinimized.TabIndex = 17;
+			this.comboboxMinimized.SelectedIndexChanged += new System.EventHandler(this.comboboxMinimized_SelectedIndexChanged);
+			this.comboboxMinimized.Click += new System.EventHandler(this.comboboxMinimized_Click);
 			// 
 			// label5
 			// 
@@ -323,7 +323,7 @@ namespace Session_windows
 			this.conmenuDelete.Name = "conmenuDelete";
 			this.conmenuDelete.Size = new System.Drawing.Size(150, 22);
 			this.conmenuDelete.Text = "Delete process";
-			this.conmenuDelete.Click += new System.EventHandler(this.conmenuDelete_Click);
+			this.conmenuDelete.Click += new System.EventHandler(this.contextmenuDeleteProcess_Click);
 			// 
 			// label8
 			// 
@@ -343,23 +343,23 @@ namespace Session_windows
 			this.label9.TabIndex = 22;
 			this.label9.Text = "Session when undocked";
 			// 
-			// cbDocked
+			// comboboxDocked
 			// 
-			this.cbDocked.FormattingEnabled = true;
-			this.cbDocked.Location = new System.Drawing.Point(12, 317);
-			this.cbDocked.Name = "cbDocked";
-			this.cbDocked.Size = new System.Drawing.Size(161, 21);
-			this.cbDocked.TabIndex = 23;
-			this.cbDocked.SelectedIndexChanged += new System.EventHandler(this.cbDocked_SelectedIndexChanged);
+			this.comboboxDocked.FormattingEnabled = true;
+			this.comboboxDocked.Location = new System.Drawing.Point(12, 317);
+			this.comboboxDocked.Name = "comboboxDocked";
+			this.comboboxDocked.Size = new System.Drawing.Size(161, 21);
+			this.comboboxDocked.TabIndex = 23;
+			this.comboboxDocked.SelectedIndexChanged += new System.EventHandler(this.comboboxDocked_SelectedIndexChanged);
 			// 
-			// cbUndocked
+			// comboboxUndocked
 			// 
-			this.cbUndocked.FormattingEnabled = true;
-			this.cbUndocked.Location = new System.Drawing.Point(12, 357);
-			this.cbUndocked.Name = "cbUndocked";
-			this.cbUndocked.Size = new System.Drawing.Size(161, 21);
-			this.cbUndocked.TabIndex = 24;
-			this.cbUndocked.SelectedIndexChanged += new System.EventHandler(this.cbUndocked_SelectedIndexChanged);
+			this.comboboxUndocked.FormattingEnabled = true;
+			this.comboboxUndocked.Location = new System.Drawing.Point(12, 357);
+			this.comboboxUndocked.Name = "comboboxUndocked";
+			this.comboboxUndocked.Size = new System.Drawing.Size(161, 21);
+			this.comboboxUndocked.TabIndex = 24;
+			this.comboboxUndocked.SelectedIndexChanged += new System.EventHandler(this.comboboxUndocked_SelectedIndexChanged);
 			// 
 			// groupBox1
 			// 
@@ -373,7 +373,7 @@ namespace Session_windows
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Controls.Add(this.txtHeight);
 			this.groupBox1.Controls.Add(this.label4);
-			this.groupBox1.Controls.Add(this.cbMinimized);
+			this.groupBox1.Controls.Add(this.comboboxMinimized);
 			this.groupBox1.Location = new System.Drawing.Point(443, 122);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(243, 170);
@@ -383,7 +383,7 @@ namespace Session_windows
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Controls.Add(this.checkBox1);
+			this.groupBox2.Controls.Add(this.checkboxStart);
 			this.groupBox2.Location = new System.Drawing.Point(443, 298);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(243, 85);
@@ -391,15 +391,16 @@ namespace Session_windows
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Settings";
 			// 
-			// checkBox1
+			// checkboxStart
 			// 
-			this.checkBox1.AutoSize = true;
-			this.checkBox1.Location = new System.Drawing.Point(6, 16);
-			this.checkBox1.Name = "checkBox1";
-			this.checkBox1.Size = new System.Drawing.Size(94, 17);
-			this.checkBox1.TabIndex = 0;
-			this.checkBox1.Text = "Start in systray";
-			this.checkBox1.UseVisualStyleBackColor = true;
+			this.checkboxStart.AutoSize = true;
+			this.checkboxStart.Location = new System.Drawing.Point(6, 16);
+			this.checkboxStart.Name = "checkboxStart";
+			this.checkboxStart.Size = new System.Drawing.Size(94, 17);
+			this.checkboxStart.TabIndex = 0;
+			this.checkboxStart.Text = "Start in systray";
+			this.checkboxStart.UseVisualStyleBackColor = true;
+			this.checkboxStart.CheckedChanged += new System.EventHandler(this.checkboxStart_CheckedChanged);
 			// 
 			// MainForm
 			// 
@@ -408,8 +409,8 @@ namespace Session_windows
 			this.ClientSize = new System.Drawing.Size(694, 390);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
-			this.Controls.Add(this.cbUndocked);
-			this.Controls.Add(this.cbDocked);
+			this.Controls.Add(this.comboboxUndocked);
+			this.Controls.Add(this.comboboxDocked);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label6);
