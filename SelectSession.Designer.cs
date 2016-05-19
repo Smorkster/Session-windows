@@ -57,13 +57,12 @@ namespace Session_windows
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(419, 262);
+			this.ClientSize = new System.Drawing.Size(354, 42);
 			this.Controls.Add(this.btnChoose);
 			this.Controls.Add(this.cbSessionSelect);
 			this.Name = "SelectSession";
-			this.Text = "SelectSession";
+			this.Text = "Select Session";
 			this.ResumeLayout(false);
 
 		}

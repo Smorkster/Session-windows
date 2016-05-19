@@ -7,53 +7,106 @@ using Microsoft.Win32;
 namespace Session_windows
 {
 
-	sealed class Program
+	static class Program
 	{
+		static NotifyIcon icon;
+		static List<Session> sessions;
+
 		[STAThread]
-		static void Main(string[] args)
+		static void Main()
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			
-			using (NotifyIcon icon = new NotifyIcon())
-			{
 
-				icon.Icon = new Icon("../../icon.ico");
-				icon.ContextMenu = new ContextMenu(new [] {
-				                                   	//new MenuItem("Show form", (s, e) => {new MainForm().Show();}),
-				                                   	new MenuItem("Show form", (s, e) => menuShow_Click()),
-				                                   	new MenuItem("Exit", (s, e) => { Application.Exit(); }),
-				                                   	});
+			using (icon = new NotifyIcon()) {
+				icon.Icon = new Icon(Resources.ICON, 32, 32);
+				icon.ContextMenuStrip = new ContextMenuStrip();
 				icon.DoubleClick += doubleClick;
 				icon.Visible = true;
+				readFile();
+				icon.ContextMenuStrip.Items.Add("-");
+				icon.ContextMenuStrip.Items.AddRange(new [] {
+					new ToolStripMenuItem("Show form", null, menuShow_Click),
+					new ToolStripMenuItem("Exit", null, (s, e) => Application.Exit()),
+				});
+				SystemEvents.DisplaySettingsChanged += screensizeChanged;
 				Application.Run();
 				icon.Visible = false;
 			}
 		}
 
+		/// <summary>
+		/// Read XML-file, gather all sessions and return as list
+		/// </summary>
+		/// <returns>List of all sessions saved</returns>
 		static List<Session> readFile()
 		{
 			FileHandler fl = new FileHandler();
-			List<Session> ss = new List<Session>();
-			ss = fl.read();
+			sessions = new List<Session>();
+			sessions = fl.read();
+			ToolStripMenuItem sessionMenu = new ToolStripMenuItem("Sessions >");
 
-			return ss;
+			for (int i = 0; i < sessions.Count; i++) {
+				sessionMenu.DropDownItems.Add(new ToolStripMenuItem(sessions[i].SessionName, null, sessionSelected));
+			}
+			icon.ContextMenuStrip.Items.Add(sessionMenu);
+
+			return sessions;
 		}
 
-		static void menuShow_Click()
+		/// <summary>
+		/// Menuitem Show was clicked in the contextmenu of the systemtray.
+		/// </summary>
+		static void menuShow_Click(object sender, EventArgs e)
 		{
-			Form m = new MainForm(readFile());
+			Form m = new MainForm(sessions);
 			m.Show();
 		}
 
+		/// <summary>
+		/// A sessionname was clicked in the contextmenu
+		/// Use the windowsettings of that session
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		static void sessionSelected(object sender, EventArgs e)
+		{
+			string name = (sender as ToolStripMenuItem).Text;
+			Session session = sessions.Find(x => x.SessionName.Equals(name));
+
+			foreach (ProcessInfo pi in session.Plist) {
+				new WindowLayout().setLayout(pi);
+			}
+		}
+
+		/// <summary>
+		/// Systrayicon was doubleclicked, open form
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic Eventargs</param>
 		static void doubleClick(object sender, EventArgs e)
 		{
-			Form m = new MainForm (readFile());
+			Form m = new MainForm(sessions);
 			m.Show();
 		}
+
+		/// <summary>
+		/// The arrea of the screen have changed, probably from being docked/undocked
+		/// Use the sessionsettings specified by the user for the layout
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic Eventargs</param>
 		static void screensizeChanged(object sender, EventArgs e)
 		{
-			throw new NotImplementedException();
+			FileHandler fl = new FileHandler();
+			int dockedStatus;
+			Session dockedSession;
+
+			dockedStatus = Screen.AllScreens.Length == 1 ? 1 : 0;
+			dockedSession = sessions.Find(x => x.SessionName.Equals(fl.getDockedSessions()[dockedStatus]));
+			foreach (ProcessInfo process in dockedSession.Plist) {
+				new WindowLayout().setLayout(process);
+			}
 		}
 	}
 }

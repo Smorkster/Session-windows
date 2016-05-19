@@ -1,0 +1,22 @@
+﻿Version 1.0
+***********
+Initial release
+
+Version 1.1
+***********
+Added an icon as resource
+Added comments
+Corrected checking of windowplacement
+Added ability to select session for when computer is docked vs undocked
+Now starts minimized to systemtray
+Contextmenu for systemtrayicon now shows a list of sessions
+	Click a sessionname to use those settings
+Now only shows SelectSession-form if no session is selected in listbox
+Corrected logic for reading file
+Textboxes for processname and ID is now always readonly
+If no process from the session is running, inform user and disable textboxes plus combobox
+WindowLayout now applies the same settings for all instances of same application
+Added tooltips for buttons
+Removed button SetSettings
+Moved controls for setting windowlayout to a groupbox
+Now checks if the list of sessions is empty. If so, disable the menuitem for "Marked"

@@ -39,7 +39,7 @@ namespace Session_windows
 			// 
 			// btnSave
 			// 
-			this.btnSave.Location = new System.Drawing.Point(196, 12);
+			this.btnSave.Location = new System.Drawing.Point(267, 10);
 			this.btnSave.Name = "btnSave";
 			this.btnSave.Size = new System.Drawing.Size(75, 23);
 			this.btnSave.TabIndex = 0;
@@ -61,16 +61,15 @@ namespace Session_windows
 			// 
 			this.txtSessionName.Location = new System.Drawing.Point(12, 12);
 			this.txtSessionName.Name = "txtSessionName";
-			this.txtSessionName.Size = new System.Drawing.Size(178, 20);
+			this.txtSessionName.Size = new System.Drawing.Size(249, 20);
 			this.txtSessionName.TabIndex = 2;
 			// 
 			// SessionName
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(284, 262);
+			this.ClientSize = new System.Drawing.Size(354, 42);
 			this.Controls.Add(this.txtSessionName);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnSave);

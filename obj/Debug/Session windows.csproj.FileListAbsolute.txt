@@ -8,3 +8,4 @@ H:\Session windows\obj\Debug\Session windows.exe
 H:\Session windows\obj\Debug\Session windows.pdb
 H:\Session windows\obj\Debug\Session_windows.SessionName.resources
 H:\Session windows\obj\Debug\Session_windows.SelectSession.resources
+H:\Session windows\obj\Debug\Session_windows.Resources.resources

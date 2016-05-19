@@ -12,8 +12,7 @@ namespace Session_windows
 		{
 			InitializeComponent();
 			sl = s;
-			foreach(Session si in s)
-			{
+			foreach (Session si in s) {
 				cbSessionSelect.Items.Add(si.SessionName);
 			}
 		}
@@ -25,6 +24,12 @@ namespace Session_windows
 		{
 			return sl.Find(x => x.SessionName.Equals(cbSessionSelect.SelectedItem.ToString()));
 		}
+
+		/// <summary>
+		/// Button is clicked
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
 		void btnChoose_Click(object sender, EventArgs e)
 		{
 			Close();
