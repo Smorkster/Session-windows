@@ -1,6 +1,17 @@
-﻿Version 1.0
+﻿Version 2.1
 ***********
-Initial release
+Rewritten XML-file handling for easier management
+Corrected some logic
+Extracted save functionality to separate buttons
+Loading of session moved to a MouseDown-method
+Now clears list of processes if a process is removed
+
+Version 2.0
+***********
+Added setting for starting application in notificationarea or show mainform
+Rewritten logic and extracted the data to object Settings to make coding clearer
+Now only opens the MainForm in one instance
+Added versionnumber to the title of MainForm
 
 Version 1.1
 ***********
@@ -21,9 +32,6 @@ Removed button SetSettings
 Moved controls for setting windowlayout to a groupbox
 Now checks if the list of sessions is empty. If so, disable the menuitem for "Marked"
 
-Version 2.0
+Version 1.0
 ***********
-Added setting for starting application in notificationarea or show mainform
-Rewritten logic and extracted the data to object Settings to make coding clearer
-Now only opens the MainForm in one instance
-Added versionnumber to the title of MainForm
+Initial release

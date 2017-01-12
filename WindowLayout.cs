@@ -16,33 +16,33 @@ namespace Session_windows
 	{
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+		internal static extern bool GetWindowPlacement (IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
 		[DllImport("user32.dll", SetLastError = true)]
-		static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int Width, int Height, bool Repaint);
+		static extern bool MoveWindow (IntPtr hWnd, int X, int Y, int Width, int Height, bool Repaint);
 
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+		static extern bool SetWindowPlacement (IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
 
 		private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
 
 		[DllImport("USER32.DLL")]
-		static extern bool EnumWindows(EnumWindowsProc enumFunc, int lParam);
+		static extern bool EnumWindows (EnumWindowsProc enumFunc, int lParam);
 
 		[DllImport("USER32.DLL")]
-		static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+		static extern int GetWindowText (IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 		[DllImport("user32.dll", SetLastError = true)]
-		static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+		static extern uint GetWindowThreadProcessId (IntPtr hWnd, out uint processId);
 
 		[DllImport("USER32.DLL")]
-		static extern int GetWindowTextLength(IntPtr hWnd);
+		static extern int GetWindowTextLength (IntPtr hWnd);
 	
 		[DllImport("USER32.DLL")]
-		static extern bool IsWindowVisible(IntPtr hWnd);
+		static extern bool IsWindowVisible (IntPtr hWnd);
 
 		[DllImport("USER32.DLL")]
-		static extern IntPtr GetShellWindow();
+		static extern IntPtr GetShellWindow ();
 
 		/// <summary>
 		/// Struct for Windowplacement of windows
@@ -78,23 +78,27 @@ namespace Session_windows
 		/// apply the settings from the processinfo
 		/// </summary>
 		/// <param name="process">Information of how the window is to be shown</param>
-		public void setLayout(ProcessInfo process)
+		public void setLayout (ProcessInfo process)
 		{
-			try {
-				foreach (KeyValuePair<IntPtr, string> window in GetOpenWindows()) {
+			try
+			{
+				foreach (KeyValuePair<IntPtr, string> window in GetOpenWindows())
+				{
 					IntPtr handle = window.Key;
 					uint id;
 					string title = window.Value;
 
 					GetWindowThreadProcessId(handle, out id);
 					Process p = Process.GetProcessById((int)id);
-					if (p.ProcessName == process.ProcessName) {
+					if (p.ProcessName == process.ProcessName)
+					{
 						MoveWindow(handle, process.Xcoordinate, process.Ycoordinate, process.Width, process.Height, true);
 
 						WINDOWPLACEMENT wp = new WINDOWPLACEMENT();
 						wp.length = Marshal.SizeOf(wp);
 						GetWindowPlacement(p.MainWindowHandle, ref wp);
-						switch (process.Minimized) {
+						switch (process.Minimized)
+						{
 							case 3:
 								wp.showCmd = ShowWindowCommands.SW_MAXIMIZE;
 								break;
@@ -108,7 +112,8 @@ namespace Session_windows
 						SetWindowPlacement(handle, ref wp);
 					}
 				}
-			} catch (ArgumentException e) {
+			} catch (ArgumentException e)
+			{
 				MessageBox.Show("No process with id " + process.ID + " is running.\n" + e.Message);
 			}
 		}
@@ -117,12 +122,13 @@ namespace Session_windows
 		/// Get a key/value pair dictionary of all the currently open windows
 		/// </summary>
 		/// <returns>Key/value dictionary of the open windows</returns>
-		public static IDictionary<IntPtr, string> GetOpenWindows()
+		public static IDictionary<IntPtr, string> GetOpenWindows ()
 		{
 			IntPtr shellWindow = GetShellWindow();
 			Dictionary<IntPtr, string> windows = new Dictionary<IntPtr, string>();
 
-			EnumWindows(delegate(IntPtr hWnd, int lParam) {
+			EnumWindows(delegate(IntPtr hWnd, int lParam)
+			{
 				if (hWnd == shellWindow)
 					return true;
 				if (!IsWindowVisible(hWnd))

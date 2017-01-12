@@ -25,28 +25,35 @@ namespace Session_windows
 		}
 
 		// disable ConvertToAutoProperty
-		public bool StartInSysTray {
+		public bool StartInSysTray
+		{
 			get { return startSysTray; }
-			set {
+			set
+			{
 				startSysTray = value;
 				Changed = true;
 			}
 		}
-		public string Docked {
+		public string Docked
+		{
 			get { return dockedUndocked[0]; }
-			set {
+			set
+			{
 				dockedUndocked[0] = value;
 				Changed = true;
 			}
 		}
-		public string Undocked {
+		public string Undocked
+		{
 			get { return dockedUndocked[1]; }
-			set {
+			set
+			{
 				dockedUndocked[1] = value;
 				Changed = true;
 			}
 		}
-		public bool Changed {
+		public bool Changed
+		{
 			get { return changed; }
 			set { changed = value; }
 		}
@@ -70,7 +77,8 @@ namespace Session_windows
 		public string[] getSessionList ()
 		{
 			string[] sessionList = new string[NumberOfSessions];
-			for (int i = 0; i < sessions.Count; i++) {
+			for (int i = 0; i < sessions.Count; i++)
+			{
 				sessionList[i] = sessions[i].SessionName;
 			}
 			
@@ -126,13 +134,17 @@ namespace Session_windows
 
 		public bool updateProcess (string processName, ProcessInfo newProcessInfo)
 		{
-			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(currentSession.SessionName));
-			int processIndex = sessions[sessionIndex].Plist.FindIndex(x => x.ProcessName.Equals(processName));
+			if (currentSession != null)
+			{
+				int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(currentSession.SessionName));
+				int processIndex = sessions[sessionIndex].Plist.FindIndex(x => x.ProcessName.Equals(processName));
 
-			if (processIndex != -1) {
-				sessions[sessionIndex].Plist[processIndex] = currentSession.Plist[processIndex] = newProcessInfo;
-				Changed = true;
-				return true;
+				if (processIndex != -1)
+				{
+					sessions[sessionIndex].Plist[processIndex] = currentSession.Plist[processIndex] = newProcessInfo;
+					Changed = true;
+					return true;
+				}
 			}
 			return false;
 		}

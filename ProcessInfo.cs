@@ -9,7 +9,6 @@ namespace Session_windows
 	public class ProcessInfo
 	{
 		int xCoordinate, yCoordinate;
-		int xCoordinatelow, yCoordinatelow;
 		int height, width;
 		int id;
 		IntPtr handle;
@@ -32,7 +31,7 @@ namespace Session_windows
 		{
 		}
 
-		public ProcessInfo(IntPtr phandle, int i, string pname, string ptitle, int left, int top, int right, int bottom, int placement)
+		public ProcessInfo(IntPtr phandle, int i, string pname, string ptitle, int left, int top, int width, int height, int placement)
 		{
 			id = i;
 			handle = phandle;
@@ -40,10 +39,8 @@ namespace Session_windows
 			mainwindowtitle = ptitle;
 			xCoordinate = left;
 			yCoordinate = top;
-			xCoordinatelow = right;
-			yCoordinatelow = bottom;
-			height = bottom - top;
-			width = right - left;
+			this.height = height;
+			this.width = width;
 			windowPlacement = placement;
 		}
 
@@ -51,8 +48,6 @@ namespace Session_windows
 		public int ID { get { return id; } set { id = value; } }
 		public int Xcoordinate { get { return xCoordinate; } set { xCoordinate = value; } }
 		public int Ycoordinate { get { return yCoordinate; } set { yCoordinate = value; } }
-		public int Xcoordinatelow { get { return xCoordinatelow; } set { xCoordinatelow = value; } }
-		public int Ycoordinatelow { get { return yCoordinatelow; } set { yCoordinatelow = value; } }
 		public IntPtr Handle { get { return handle; } }
 		public int Height { get { return height; } set { height = value; } }
 		public int Width { get { return width; } set { width = value; } }

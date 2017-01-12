@@ -20,12 +20,9 @@ namespace Session_windows
 		private System.Windows.Forms.TextBox txtHeight;
 		private System.Windows.Forms.ToolTip ttInfo;
 		private System.Windows.Forms.TextBox txtProcess;
-		private System.Windows.Forms.Button btnSave;
+		private System.Windows.Forms.Button btnSaveSession;
 		private System.Windows.Forms.TextBox txtId;
 		private System.Windows.Forms.ListBox lbSessions;
-		private System.Windows.Forms.ContextMenuStrip conmenuSave;
-		private System.Windows.Forms.ToolStripMenuItem conmenuNew;
-		private System.Windows.Forms.ToolStripMenuItem conmenuMarked;
 		private System.Windows.Forms.ComboBox comboboxMinimized;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label6;
@@ -39,6 +36,7 @@ namespace Session_windows
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.CheckBox checkboxStart;
+		private System.Windows.Forms.Button btnCreateNew;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -75,10 +73,7 @@ namespace Session_windows
 			this.txtHeight = new System.Windows.Forms.TextBox();
 			this.ttInfo = new System.Windows.Forms.ToolTip(this.components);
 			this.txtProcess = new System.Windows.Forms.TextBox();
-			this.btnSave = new System.Windows.Forms.Button();
-			this.conmenuSave = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.conmenuNew = new System.Windows.Forms.ToolStripMenuItem();
-			this.conmenuMarked = new System.Windows.Forms.ToolStripMenuItem();
+			this.btnSaveSession = new System.Windows.Forms.Button();
 			this.txtId = new System.Windows.Forms.TextBox();
 			this.lbSessions = new System.Windows.Forms.ListBox();
 			this.comboboxMinimized = new System.Windows.Forms.ComboBox();
@@ -94,7 +89,7 @@ namespace Session_windows
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkboxStart = new System.Windows.Forms.CheckBox();
-			this.conmenuSave.SuspendLayout();
+			this.btnCreateNew = new System.Windows.Forms.Button();
 			this.conmenuDeleteProcess.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -125,6 +120,7 @@ namespace Session_windows
 			// 
 			// btnSetProcessInfo
 			// 
+			this.btnSetProcessInfo.Enabled = false;
 			this.btnSetProcessInfo.Location = new System.Drawing.Point(191, 144);
 			this.btnSetProcessInfo.Name = "btnSetProcessInfo";
 			this.btnSetProcessInfo.Size = new System.Drawing.Size(46, 23);
@@ -217,41 +213,17 @@ namespace Session_windows
 			this.txtProcess.Size = new System.Drawing.Size(243, 20);
 			this.txtProcess.TabIndex = 11;
 			// 
-			// btnSave
+			// btnSaveSession
 			// 
-			this.btnSave.AutoSize = true;
-			this.btnSave.ContextMenuStrip = this.conmenuSave;
-			this.btnSave.Location = new System.Drawing.Point(12, 12);
-			this.btnSave.Name = "btnSave";
-			this.btnSave.Size = new System.Drawing.Size(80, 23);
-			this.btnSave.TabIndex = 12;
-			this.btnSave.Text = "Save session";
-			this.btnSave.UseVisualStyleBackColor = true;
-			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-			this.btnSave.MouseHover += new System.EventHandler(this.btnSave_MouseHover);
-			// 
-			// conmenuSave
-			// 
-			this.conmenuSave.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-			this.conmenuNew,
-			this.conmenuMarked});
-			this.conmenuSave.Name = "cmenuSave";
-			this.conmenuSave.Size = new System.Drawing.Size(115, 48);
-			this.conmenuSave.Opening += new System.ComponentModel.CancelEventHandler(this.contextmenuSave_Opening);
-			// 
-			// conmenuNew
-			// 
-			this.conmenuNew.Name = "conmenuNew";
-			this.conmenuNew.Size = new System.Drawing.Size(114, 22);
-			this.conmenuNew.Text = "New";
-			this.conmenuNew.Click += new System.EventHandler(this.contextmenuSaveNewSession_Click);
-			// 
-			// conmenuMarked
-			// 
-			this.conmenuMarked.Name = "conmenuMarked";
-			this.conmenuMarked.Size = new System.Drawing.Size(114, 22);
-			this.conmenuMarked.Text = "Marked";
-			this.conmenuMarked.Click += new System.EventHandler(this.contextmenuSaveMarkedSession_Click);
+			this.btnSaveSession.AutoSize = true;
+			this.btnSaveSession.Enabled = false;
+			this.btnSaveSession.Location = new System.Drawing.Point(12, 12);
+			this.btnSaveSession.Name = "btnSaveSession";
+			this.btnSaveSession.Size = new System.Drawing.Size(80, 23);
+			this.btnSaveSession.TabIndex = 12;
+			this.btnSaveSession.Text = "Save session";
+			this.btnSaveSession.UseVisualStyleBackColor = true;
+			this.btnSaveSession.Click += new System.EventHandler(this.btnSaveSession_Click);
 			// 
 			// txtId
 			// 
@@ -268,7 +240,7 @@ namespace Session_windows
 			this.lbSessions.Name = "lbSessions";
 			this.lbSessions.Size = new System.Drawing.Size(161, 251);
 			this.lbSessions.TabIndex = 15;
-			this.lbSessions.SelectedIndexChanged += new System.EventHandler(this.lbSessions_SelectedIndexChanged);
+			this.lbSessions.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbSessions_MouseDown);
 			// 
 			// comboboxMinimized
 			// 
@@ -402,11 +374,23 @@ namespace Session_windows
 			this.checkboxStart.UseVisualStyleBackColor = true;
 			this.checkboxStart.CheckedChanged += new System.EventHandler(this.checkboxStart_CheckedChanged);
 			// 
+			// btnCreateNew
+			// 
+			this.btnCreateNew.Enabled = false;
+			this.btnCreateNew.Location = new System.Drawing.Point(98, 12);
+			this.btnCreateNew.Name = "btnCreateNew";
+			this.btnCreateNew.Size = new System.Drawing.Size(75, 23);
+			this.btnCreateNew.TabIndex = 28;
+			this.btnCreateNew.Text = "Create new";
+			this.btnCreateNew.UseVisualStyleBackColor = true;
+			this.btnCreateNew.Click += new System.EventHandler(this.btnCreateNew_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(694, 390);
+			this.Controls.Add(this.btnCreateNew);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.comboboxUndocked);
@@ -417,7 +401,7 @@ namespace Session_windows
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.lbSessions);
 			this.Controls.Add(this.txtId);
-			this.Controls.Add(this.btnSave);
+			this.Controls.Add(this.btnSaveSession);
 			this.Controls.Add(this.txtProcess);
 			this.Controls.Add(this.btnGetProcesses);
 			this.Controls.Add(this.lbProcesses);
@@ -426,7 +410,6 @@ namespace Session_windows
 			this.MinimizeBox = false;
 			this.Name = "MainForm";
 			this.Text = "Session windows";
-			this.conmenuSave.ResumeLayout(false);
 			this.conmenuDeleteProcess.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();

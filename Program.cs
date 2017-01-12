@@ -16,12 +16,13 @@ namespace Session_windows
 		static Form m = null;
 
 		[STAThread]
-		static void Main()
+		static void Main ()
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
-			using (icon = new NotifyIcon()) {
+			using (icon = new NotifyIcon())
+			{
 				icon.Icon = new Icon(Resources.ICON, 32, 32);
 				icon.ContextMenuStrip = new ContextMenuStrip();
 				icon.DoubleClick += doubleClick;
@@ -33,7 +34,8 @@ namespace Session_windows
 					new ToolStripMenuItem("Exit", null, (s, e) => Application.Exit()),
 				});
 				SystemEvents.DisplaySettingsChanged += screensizeChanged;
-				if (!settings.StartInSysTray) {
+				if (!settings.StartInSysTray)
+				{
 					m = new MainForm(ref settings);
 					m.Show();
 				}
@@ -45,30 +47,29 @@ namespace Session_windows
 		/// <summary>
 		/// Read XML-file, gather all sessions and add them as menuitems for the notifyicon
 		/// </summary>
-		static void readFile()
+		static void readFile ()
 		{
 			FileHandler fl = new FileHandler();
 
-			if (File.Exists(@"H:\WindowSession.xml")) {
-				try {
-					foreach(Session s in fl.read("Program.readFile"))
-					{
-						settings.addSession(s);
-					}
+			if (File.Exists(@"H:\WindowSession - Test.xml"))
+			{
+				try
+				{
+					settings = fl.read();
 
-					settings.Docked = fl.getDockedSessions()[0];
-					settings.Undocked = fl.getDockedSessions()[1];
-					settings.StartInSysTray = fl.getStart();
 					ToolStripMenuItem sessionMenu = new ToolStripMenuItem("Sessions >");
 
-					for (int i = 0; i < settings.NumberOfSessions; i++) {
+					for (int i = 0; i < settings.NumberOfSessions; i++)
+					{
 						sessionMenu.DropDownItems.Add(new ToolStripMenuItem(settings.getSession(i).SessionName, null, sessionSelected));
 					}
 					icon.ContextMenuStrip.Items.Add(sessionMenu);
-				} catch (XmlException e) {
+				} catch (XmlException e)
+				{
 					MessageBox.Show("Error while reading XML-file:\nAt: " + e.LineNumber + "\n\n" + e.Message, "");
 				}
-			} else {
+			} else
+			{
 				MessageBox.Show("WindowSession.xml was not found", "");
 				
 			}
@@ -77,7 +78,7 @@ namespace Session_windows
 		/// <summary>
 		/// Menuitem Show was clicked in the contextmenu of the systemtray.
 		/// </summary>
-		static void menuShow_Click(object sender, EventArgs e)
+		static void menuShow_Click (object sender, EventArgs e)
 		{
 			if (m != null)
 				m.BringToFront();
@@ -94,12 +95,13 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		static void sessionSelected(object sender, EventArgs e)
+		static void sessionSelected (object sender, EventArgs e)
 		{
 			string name = (sender as ToolStripMenuItem).Text;
 			Session session = settings.getSession(name);
 
-			foreach (ProcessInfo pi in session.Plist) {
+			foreach (ProcessInfo pi in session.Plist)
+			{
 				new WindowLayout().setLayout(pi);
 			}
 		}
@@ -109,7 +111,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic Eventargs</param>
-		static void doubleClick(object sender, EventArgs e)
+		static void doubleClick (object sender, EventArgs e)
 		{
 			if (m != null)
 				m.BringToFront();
@@ -126,7 +128,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic Eventargs</param>
-		static void screensizeChanged(object sender, EventArgs e)
+		static void screensizeChanged (object sender, EventArgs e)
 		{
 			FileHandler fl = new FileHandler();
 			Session session = new Session();
@@ -134,10 +136,12 @@ namespace Session_windows
 			if (Screen.AllScreens.Length == 1)
 			{
 				session = settings.getSession(settings.Undocked);
-			} else {
+			} else
+			{
 				session = settings.getSession(settings.Docked);
 			}
-			foreach (ProcessInfo process in session.Plist) {
+			foreach (ProcessInfo process in session.Plist)
+			{
 				new WindowLayout().setLayout(process);
 			}
 		}
