@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="FileHandler.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
@@ -74,6 +75,10 @@
       <DependentUpon>NewSessionName.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
+    <Compile Include="WindowInfo.cs" />
+    <Compile Include="WindowInfo.Designer.cs">
+      <DependentUpon>WindowInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="WindowLayout.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +98,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NewSessionName.resx">
       <DependentUpon>NewSessionName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WindowInfo.resx">
+      <DependentUpon>WindowInfo.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

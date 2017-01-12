@@ -37,6 +37,9 @@ namespace Session_windows
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.CheckBox checkboxStart;
 		private System.Windows.Forms.Button btnCreateNew;
+		private System.Windows.Forms.Button btnWinInfo;
+		private System.Windows.Forms.ContextMenuStrip conmsActiveWindows;
+		private System.Windows.Forms.Button btnClose;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -90,6 +93,9 @@ namespace Session_windows
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkboxStart = new System.Windows.Forms.CheckBox();
 			this.btnCreateNew = new System.Windows.Forms.Button();
+			this.btnWinInfo = new System.Windows.Forms.Button();
+			this.conmsActiveWindows = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.btnClose = new System.Windows.Forms.Button();
 			this.conmenuDeleteProcess.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -358,6 +364,7 @@ namespace Session_windows
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.btnClose);
 			this.groupBox2.Controls.Add(this.checkboxStart);
 			this.groupBox2.Location = new System.Drawing.Point(443, 298);
 			this.groupBox2.Name = "groupBox2";
@@ -388,11 +395,37 @@ namespace Session_windows
 			this.btnCreateNew.UseVisualStyleBackColor = true;
 			this.btnCreateNew.Click += new System.EventHandler(this.btnCreateNew_Click);
 			// 
+			// btnWinInfo
+			// 
+			this.btnWinInfo.Location = new System.Drawing.Point(362, 12);
+			this.btnWinInfo.Name = "btnWinInfo";
+			this.btnWinInfo.Size = new System.Drawing.Size(75, 23);
+			this.btnWinInfo.TabIndex = 29;
+			this.btnWinInfo.Text = "WinInfo";
+			this.btnWinInfo.UseVisualStyleBackColor = true;
+			this.btnWinInfo.Click += new System.EventHandler(this.btnWinInfo_Click);
+			// 
+			// conmsActiveWindows
+			// 
+			this.conmsActiveWindows.Name = "conMS";
+			this.conmsActiveWindows.Size = new System.Drawing.Size(61, 4);
+			// 
+			// btnClose
+			// 
+			this.btnClose.Location = new System.Drawing.Point(149, 56);
+			this.btnClose.Name = "btnClose";
+			this.btnClose.Size = new System.Drawing.Size(88, 23);
+			this.btnClose.TabIndex = 30;
+			this.btnClose.Text = "Exit application";
+			this.btnClose.UseVisualStyleBackColor = true;
+			this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(694, 390);
+			this.Controls.Add(this.btnWinInfo);
 			this.Controls.Add(this.btnCreateNew);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
