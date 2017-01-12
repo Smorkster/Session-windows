@@ -116,6 +116,7 @@ namespace Session_windows
 			this.btnGetProcesses.Text = "Get Processes";
 			this.btnGetProcesses.UseVisualStyleBackColor = true;
 			this.btnGetProcesses.Click += new System.EventHandler(this.btnGetProcesses_Click);
+			this.btnGetProcesses.MouseLeave += new System.EventHandler(this.control_MouseLeave);
 			this.btnGetProcesses.MouseHover += new System.EventHandler(this.btnGetProcesses_MouseHover);
 			// 
 			// btnSetProcessInfo
@@ -136,6 +137,7 @@ namespace Session_windows
 			this.txtX.Size = new System.Drawing.Size(55, 20);
 			this.txtX.TabIndex = 3;
 			this.txtX.TextChanged += new System.EventHandler(this.txtX_TextChanged);
+			this.txtX.MouseLeave += new System.EventHandler(this.control_MouseLeave);
 			this.txtX.MouseHover += new System.EventHandler(this.txtCoordinate_MouseHover);
 			// 
 			// label1
@@ -165,6 +167,7 @@ namespace Session_windows
 			this.txtY.Size = new System.Drawing.Size(55, 20);
 			this.txtY.TabIndex = 5;
 			this.txtY.TextChanged += new System.EventHandler(this.txtY_TextChanged);
+			this.txtY.MouseLeave += new System.EventHandler(this.control_MouseLeave);
 			this.txtY.MouseHover += new System.EventHandler(this.txtCoordinate_MouseHover);
 			// 
 			// label3

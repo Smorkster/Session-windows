@@ -244,6 +244,17 @@ namespace Session_windows
 		}
 
 		/// <summary>
+		/// The mousepointer is no longer over the control.
+		/// Hide the tooltip
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void control_MouseLeave (object sender, EventArgs e)
+		{
+			ttInfo.Active = false;
+		}
+
+		/// <summary>
 		/// New layoutinfo have been entered, input this to the processlist
 		/// and to the processlist of the session
 		/// </summary>

@@ -1,4 +1,8 @@
-﻿Version 2.1
+﻿Version 2.2
+***********
+The tooltip for controls will now inactivate when the mouse leaves the visible area
+
+Version 2.1
 ***********
 Rewritten XML-file handling for easier management
 Corrected some logic
