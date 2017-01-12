@@ -77,7 +77,7 @@ namespace Session_windows
 			Text += " for "+process.ProcessName;
 
 			label1.Text = "Processname: " + process.ProcessName+"\n";
-			label1.Text += "Process file name: "+process.MainModule.FileName+"\n";
+			//label1.Text += "Process file name: "+process.MainModule.FileName+"\n";
 			label1.Text += "MainWindowTitle: " + (process.MainWindowTitle.Equals("") ? "Process: " + process.ProcessName : process.MainWindowTitle)+"\n";
 			label1.Text += "ProcessID: " + processID+"\n";
 			label1.Text += "X coordinate top: " + pos.left+"\n";

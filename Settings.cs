@@ -13,8 +13,8 @@ namespace Session_windows
 		string[] dockedUndocked;
 		bool startSysTray;
 		bool changed;
-		public Session currentSession;
-		public List<ProcessInfo> currentProcessesList;
+		public Session savedSession;
+		public List<ProcessInfo> sessionProcessList;
 
 		public Settings()
 		{
@@ -25,84 +25,76 @@ namespace Session_windows
 		}
 
 		// disable ConvertToAutoProperty
-		public bool StartInSysTray
-		{
+		public bool StartInSysTray {
 			get { return startSysTray; }
-			set
-			{
+			set {
 				startSysTray = value;
 				Changed = true;
 			}
 		}
-		public string Docked
-		{
+		public string Docked {
 			get { return dockedUndocked[0]; }
-			set
-			{
+			set {
 				dockedUndocked[0] = value;
 				Changed = true;
 			}
 		}
-		public string Undocked
-		{
+		public string Undocked {
 			get { return dockedUndocked[1]; }
-			set
-			{
+			set {
 				dockedUndocked[1] = value;
 				Changed = true;
 			}
 		}
-		public bool Changed
-		{
+		public bool Changed {
 			get { return changed; }
 			set { changed = value; }
 		}
 		public int NumberOfSessions { get { return sessions.Count; } }
 
-		public Session getSession (string sessionName)
+		public Session getSession(string sessionName)
 		{
 			return sessions.Find(x => x.SessionName.Equals(sessionName));
 		}
 		
-		public Session getSession (int index)
+		public Session getSession(int index)
 		{
 			return sessions[index];
 		}
 
-		public int getSessionIndex (string sessionName)
+		public int getSessionIndex(string sessionName)
 		{
 			return sessions.FindIndex(x => x.SessionName.Equals(sessionName));
 		}
 
-		public string[] getSessionList ()
+		public string[] getSessionList()
 		{
 			string[] sessionList = new string[NumberOfSessions];
-			for (int i = 0; i < sessions.Count; i++)
-			{
+			for (int i = 0; i < sessions.Count; i++) {
 				sessionList[i] = sessions[i].SessionName;
 			}
 			
 			return sessionList;
 		}
 
-		public ProcessInfo getProcessInfo (string sessionName, string processName)
+		public ProcessInfo getProcessInfo(string sessionName, string processName)
 		{
 			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(sessionName));
 			return sessions[sessionIndex].Plist.Find(x => x.ProcessName.Equals(processName));
 		}
 
-		public void setCurrentSession (string sessionName)
+		public void setSavedSession(string sessionName)
 		{
 			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(sessionName));
-			currentSession = sessions.Find(x => x.SessionName.Equals(sessionName));
+			savedSession = sessions.Find(x => x.SessionName.Equals(sessionName));
 		}
 
-		public void setCurrentProcesses (List<ProcessInfo> processList)
+		public void setSessionProcessList(List<ProcessInfo> processList)
 		{
-			currentProcessesList = processList;
+			sessionProcessList = processList;
 		}
 		
-		public void addSession (Session sessionToAdd)
+		public void addSession(Session sessionToAdd)
 		{
 			if (sessions == null)
 				sessions = new List<Session>();
@@ -110,14 +102,14 @@ namespace Session_windows
 			Changed = true;
 		}
 
-		public void addProcessToSession (string sessionName, ProcessInfo process)
+		public void addProcessToSession(string sessionName, ProcessInfo process)
 		{
 			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(sessionName));
 			sessions[sessionIndex].Plist.Add(process);
 			Changed = true;
 		}
 
-		public void deleteProcessFromSession (string sessionName, ProcessInfo process)
+		public void deleteProcessFromSession(string sessionName, ProcessInfo process)
 		{
 			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(sessionName));
 			int processIndex = sessions[sessionIndex].Plist.FindIndex(x => x.ID == process.ID);
@@ -125,23 +117,21 @@ namespace Session_windows
 			Changed = true;
 		}
 		
-		public void deleteSession (string sessionName)
+		public void deleteSession(string sessionName)
 		{
 			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(sessionName));
 			sessions.RemoveAt(sessionIndex);
 			Changed = true;
 		}
 
-		public bool updateProcess (string processName, ProcessInfo newProcessInfo)
+		public bool updateProcess(string processName, ProcessInfo newProcessInfo)
 		{
-			if (currentSession != null)
-			{
-				int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(currentSession.SessionName));
+			if (savedSession != null) {
+				int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(savedSession.SessionName));
 				int processIndex = sessions[sessionIndex].Plist.FindIndex(x => x.ProcessName.Equals(processName));
 
-				if (processIndex != -1)
-				{
-					sessions[sessionIndex].Plist[processIndex] = currentSession.Plist[processIndex] = newProcessInfo;
+				if (processIndex != -1) {
+					sessions[sessionIndex].Plist[processIndex] = savedSession.Plist[processIndex] = newProcessInfo;
 					Changed = true;
 					return true;
 				}
@@ -149,10 +139,10 @@ namespace Session_windows
 			return false;
 		}
 
-		public void updateSession ()
+		public void updateSession()
 		{
-			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(currentSession.SessionName));
-			sessions[sessionIndex] = currentSession;
+			int sessionIndex = sessions.FindIndex(x => x.SessionName.Equals(savedSession.SessionName));
+			sessions[sessionIndex] = savedSession;
 			Changed = true;
 		}
 	}

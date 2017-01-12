@@ -14,6 +14,9 @@ namespace Session_windows
 	/// </summary>
 	public class WindowLayout
 	{
+		[DllImport("kernel32.dll")]
+	    static extern uint GetLastError();
+
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool GetWindowPlacement (IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
@@ -27,21 +30,21 @@ namespace Session_windows
 
 		private delegate bool EnumWindowsProc(IntPtr hWnd, int lParam);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		static extern bool EnumWindows (EnumWindowsProc enumFunc, int lParam);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		static extern int GetWindowText (IntPtr hWnd, StringBuilder lpString, int nMaxCount);
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern uint GetWindowThreadProcessId (IntPtr hWnd, out uint processId);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		static extern int GetWindowTextLength (IntPtr hWnd);
 	
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		static extern bool IsWindowVisible (IntPtr hWnd);
 
-		[DllImport("USER32.DLL")]
+		[DllImport("user32.dll")]
 		static extern IntPtr GetShellWindow ();
 
 		/// <summary>
@@ -71,7 +74,7 @@ namespace Session_windows
 			SW_MAXIMIZE = 3,
 			// Maximized
 		}
-
+		
 		/// <summary>
 		/// Take the processinfo specified by the user,
 		/// find all open windows of the same processname,

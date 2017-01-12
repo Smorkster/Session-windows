@@ -7,7 +7,6 @@ namespace Session_windows
 		/// Designer variable used to keep track of non-visual components.
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
-		private System.Windows.Forms.ListBox lbProcesses;
 		private System.Windows.Forms.Button btnGetProcesses;
 		private System.Windows.Forms.Button btnSetProcessInfo;
 		private System.Windows.Forms.TextBox txtX;
@@ -40,6 +39,9 @@ namespace Session_windows
 		private System.Windows.Forms.Button btnWinInfo;
 		private System.Windows.Forms.ContextMenuStrip conmsActiveWindows;
 		private System.Windows.Forms.Button btnClose;
+		private System.Windows.Forms.ListView lvProcesses;
+		private System.Windows.Forms.ColumnHeader colID;
+		private System.Windows.Forms.ColumnHeader colName;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -63,7 +65,6 @@ namespace Session_windows
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.lbProcesses = new System.Windows.Forms.ListBox();
 			this.btnGetProcesses = new System.Windows.Forms.Button();
 			this.btnSetProcessInfo = new System.Windows.Forms.Button();
 			this.txtX = new System.Windows.Forms.TextBox();
@@ -91,26 +92,18 @@ namespace Session_windows
 			this.comboboxUndocked = new System.Windows.Forms.ComboBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.btnClose = new System.Windows.Forms.Button();
 			this.checkboxStart = new System.Windows.Forms.CheckBox();
 			this.btnCreateNew = new System.Windows.Forms.Button();
 			this.btnWinInfo = new System.Windows.Forms.Button();
 			this.conmsActiveWindows = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.btnClose = new System.Windows.Forms.Button();
+			this.lvProcesses = new System.Windows.Forms.ListView();
+			this.colID = new System.Windows.Forms.ColumnHeader();
+			this.colName = new System.Windows.Forms.ColumnHeader();
 			this.conmenuDeleteProcess.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// lbProcesses
-			// 
-			this.lbProcesses.FormattingEnabled = true;
-			this.lbProcesses.Location = new System.Drawing.Point(179, 41);
-			this.lbProcesses.MultiColumn = true;
-			this.lbProcesses.Name = "lbProcesses";
-			this.lbProcesses.Size = new System.Drawing.Size(258, 342);
-			this.lbProcesses.TabIndex = 0;
-			this.lbProcesses.SelectedIndexChanged += new System.EventHandler(this.lbProcesses_SelectedIndexChanged);
-			this.lbProcesses.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbProcesses_MouseDown);
 			// 
 			// btnGetProcesses
 			// 
@@ -216,6 +209,7 @@ namespace Session_windows
 			// 
 			// txtProcess
 			// 
+			this.txtProcess.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.txtProcess.Location = new System.Drawing.Point(443, 57);
 			this.txtProcess.Name = "txtProcess";
 			this.txtProcess.ReadOnly = true;
@@ -225,7 +219,6 @@ namespace Session_windows
 			// btnSaveSession
 			// 
 			this.btnSaveSession.AutoSize = true;
-			this.btnSaveSession.Enabled = false;
 			this.btnSaveSession.Location = new System.Drawing.Point(12, 12);
 			this.btnSaveSession.Name = "btnSaveSession";
 			this.btnSaveSession.Size = new System.Drawing.Size(80, 23);
@@ -236,6 +229,7 @@ namespace Session_windows
 			// 
 			// txtId
 			// 
+			this.txtId.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.txtId.Location = new System.Drawing.Point(443, 96);
 			this.txtId.Name = "txtId";
 			this.txtId.ReadOnly = true;
@@ -267,6 +261,7 @@ namespace Session_windows
 			// 
 			// label5
 			// 
+			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label5.AutoSize = true;
 			this.label5.Location = new System.Drawing.Point(443, 41);
 			this.label5.Name = "label5";
@@ -276,6 +271,7 @@ namespace Session_windows
 			// 
 			// label6
 			// 
+			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label6.AutoSize = true;
 			this.label6.Location = new System.Drawing.Point(443, 80);
 			this.label6.Name = "label6";
@@ -297,12 +293,13 @@ namespace Session_windows
 			this.conmenuDeleteProcess.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
 			this.conmenuDelete});
 			this.conmenuDeleteProcess.Name = "cmSysTray";
-			this.conmenuDeleteProcess.Size = new System.Drawing.Size(151, 26);
+			this.conmenuDeleteProcess.ShowImageMargin = false;
+			this.conmenuDeleteProcess.Size = new System.Drawing.Size(126, 26);
 			// 
 			// conmenuDelete
 			// 
 			this.conmenuDelete.Name = "conmenuDelete";
-			this.conmenuDelete.Size = new System.Drawing.Size(150, 22);
+			this.conmenuDelete.Size = new System.Drawing.Size(125, 22);
 			this.conmenuDelete.Text = "Delete process";
 			this.conmenuDelete.Click += new System.EventHandler(this.contextmenuDeleteProcess_Click);
 			// 
@@ -344,6 +341,7 @@ namespace Session_windows
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox1.Controls.Add(this.label7);
 			this.groupBox1.Controls.Add(this.btnSetProcessInfo);
 			this.groupBox1.Controls.Add(this.txtX);
@@ -364,6 +362,7 @@ namespace Session_windows
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupBox2.Controls.Add(this.btnClose);
 			this.groupBox2.Controls.Add(this.checkboxStart);
 			this.groupBox2.Location = new System.Drawing.Point(443, 298);
@@ -371,7 +370,17 @@ namespace Session_windows
 			this.groupBox2.Size = new System.Drawing.Size(243, 85);
 			this.groupBox2.TabIndex = 26;
 			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Settings";
+			this.groupBox2.Text = "Applicationsettings";
+			// 
+			// btnClose
+			// 
+			this.btnClose.Location = new System.Drawing.Point(149, 56);
+			this.btnClose.Name = "btnClose";
+			this.btnClose.Size = new System.Drawing.Size(88, 23);
+			this.btnClose.TabIndex = 30;
+			this.btnClose.Text = "Exit application";
+			this.btnClose.UseVisualStyleBackColor = true;
+			this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
 			// 
 			// checkboxStart
 			// 
@@ -397,6 +406,7 @@ namespace Session_windows
 			// 
 			// btnWinInfo
 			// 
+			this.btnWinInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.btnWinInfo.Location = new System.Drawing.Point(362, 12);
 			this.btnWinInfo.Name = "btnWinInfo";
 			this.btnWinInfo.Size = new System.Drawing.Size(75, 23);
@@ -408,23 +418,44 @@ namespace Session_windows
 			// conmsActiveWindows
 			// 
 			this.conmsActiveWindows.Name = "conMS";
-			this.conmsActiveWindows.Size = new System.Drawing.Size(61, 4);
+			this.conmsActiveWindows.ShowImageMargin = false;
+			this.conmsActiveWindows.Size = new System.Drawing.Size(36, 4);
 			// 
-			// btnClose
+			// lvProcesses
 			// 
-			this.btnClose.Location = new System.Drawing.Point(149, 56);
-			this.btnClose.Name = "btnClose";
-			this.btnClose.Size = new System.Drawing.Size(88, 23);
-			this.btnClose.TabIndex = 30;
-			this.btnClose.Text = "Exit application";
-			this.btnClose.UseVisualStyleBackColor = true;
-			this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+			this.lvProcesses.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			| System.Windows.Forms.AnchorStyles.Left) 
+			| System.Windows.Forms.AnchorStyles.Right)));
+			this.lvProcesses.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+			this.colID,
+			this.colName});
+			this.lvProcesses.FullRowSelect = true;
+			this.lvProcesses.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.lvProcesses.Location = new System.Drawing.Point(179, 41);
+			this.lvProcesses.MultiSelect = false;
+			this.lvProcesses.Name = "lvProcesses";
+			this.lvProcesses.Size = new System.Drawing.Size(258, 342);
+			this.lvProcesses.TabIndex = 30;
+			this.lvProcesses.UseCompatibleStateImageBehavior = false;
+			this.lvProcesses.View = System.Windows.Forms.View.Details;
+			this.lvProcesses.SelectedIndexChanged += new System.EventHandler(this.lvProcesses_SelectedIndexChanged);
+			this.lvProcesses.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lvProcesses_MouseDown);
+			// 
+			// colID
+			// 
+			this.colID.Text = "PID";
+			// 
+			// colName
+			// 
+			this.colName.Text = "PName";
+			this.colName.Width = 190;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(694, 390);
+			this.Controls.Add(this.lvProcesses);
 			this.Controls.Add(this.btnWinInfo);
 			this.Controls.Add(this.btnCreateNew);
 			this.Controls.Add(this.groupBox2);
@@ -440,10 +471,10 @@ namespace Session_windows
 			this.Controls.Add(this.btnSaveSession);
 			this.Controls.Add(this.txtProcess);
 			this.Controls.Add(this.btnGetProcesses);
-			this.Controls.Add(this.lbProcesses);
 			this.Icon = global::Session_windows.Resources.ICON;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(706, 422);
 			this.Name = "MainForm";
 			this.Text = "Session windows";
 			this.conmenuDeleteProcess.ResumeLayout(false);

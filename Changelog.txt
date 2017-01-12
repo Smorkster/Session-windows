@@ -1,4 +1,15 @@
-﻿Version 2.3
+﻿Version 2.4
+***********
+Removed limitation of own ProcessID from WinInfo
+Now fills lbProcesses on start
+The iconmargin for contextmenus is removed
+Replaced listbox with listview for processes
+btnSaveSession is now enabled as default
+Corrected saving of height and width of windows
+Controls on the righthandside in the mainform now is anchored to rightside of form
+A minimum size of mainform i set
+
+Version 2.3
 ***********
 Added button to exit application
 Added button to get a form with info on a given open application

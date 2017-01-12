@@ -70,27 +70,28 @@ namespace Session_windows
 		{
 			InitializeComponent();
 			this.settings = s;
-			lbProcesses.SelectedIndexChanged -= lbProcesses_SelectedIndexChanged;
+			lvProcesses.SelectedIndexChanged -= lvProcesses_SelectedIndexChanged;
 			checkboxStart.Checked = settings.StartInSysTray;
 			populateSessions();
-			lbProcesses.SelectedIndexChanged += lbProcesses_SelectedIndexChanged;
+			populateProcesses();
+			lvProcesses.SelectedIndexChanged += lvProcesses_SelectedIndexChanged;
 			Text = "Session window version " + System.Reflection.Assembly.GetExecutingAssembly()
 				.GetName().Version;
 			btnSaveSession.Enabled = false;
 		}
 
 		/// <summary>
-		/// Take data from current processlist and fill the listbox
-		/// If processlist is empty (pList), create list from currently running processes
+		/// Update current processlist with windowinfo from currently running processes
 		/// </summary>
 		public void populateProcesses()
 		{
-			if (settings.currentProcessesList == null) {
+			if (settings.sessionProcessList == null) {
 				activeProcesses = Process.GetProcesses()
 					.Where(p => p.MainWindowHandle != IntPtr.Zero &&
-				p.ProcessName != "iexplore" &&
-				p.Id != Process.GetCurrentProcess().Id);
-				settings.currentProcessesList = new List<ProcessInfo>();
+						p.ProcessName != "iexplore" &&
+						p.Id != Process.GetCurrentProcess().Id)
+					.OrderBy(p => p.ProcessName);
+				settings.sessionProcessList = new List<ProcessInfo>();
 				foreach (Process p in activeProcesses) {
 					IntPtr handle = p.MainWindowHandle;
 					WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
@@ -100,21 +101,26 @@ namespace Session_windows
 						GetWindowPlacement(p.MainWindowHandle, ref placement);
 						IntPtr h = p.MainWindowHandle;
 						string pn = p.ProcessName;
-						string mwt;
-						mwt = p.MainWindowTitle.Equals("") ? "Process: " + p.ProcessName : p.MainWindowTitle;
+						string mwt = p.MainWindowTitle.Equals("") ? "Process: " + p.ProcessName : p.MainWindowTitle;
 						int i = p.Id;
 						int l = Rect.left;
 						int t = Rect.top;
 						int r = Rect.right;
 						int b = Rect.bottom;
 						int pl = (int)placement.showCmd;
-						settings.currentProcessesList.Add(new ProcessInfo(h, i, pn, mwt, l, t, r, b, pl));
-						lbProcesses.Items.Add(p.ProcessName);
+						settings.sessionProcessList.Add(new ProcessInfo(h, i, pn, mwt, l, t, (r - l), (b - t), pl));
+						string[] item = new string[2];
+						item[0] = i.ToString();
+						item[1] = p.ProcessName;
+						lvProcesses.Items.Add(new ListViewItem(item));
 					}
 				}
 			} else {
-				foreach (ProcessInfo item in settings.currentProcessesList) {
-					lbProcesses.Items.Add(item.ProcessName);
+				foreach (ProcessInfo p in settings.sessionProcessList) {
+					string[] li = new string [2];
+					li[0] = p.ID.ToString();
+					li[1] = p.ProcessName;
+					lvProcesses.Items.Add(new ListViewItem(li));
 				}
 			}
 		}
@@ -126,7 +132,7 @@ namespace Session_windows
 		{
 			string[] sessionList = settings.getSessionList();
 			if (sessionList != null) {
-				off();
+				eventsOff();
 				foreach (string s in sessionList) {
 					lbSessions.Items.Add(s);
 				}
@@ -143,10 +149,13 @@ namespace Session_windows
 						comboboxDocked.SelectedIndex = comboboxDocked.FindStringExact(settings.Docked);
 					}
 				}
-				on();
+				eventsOn();
 			}
 		}
 
+		/// <summary>
+		/// Fills the dropdownlist for choosing what settings to be used when docked/undocked
+		/// </summary>
 		void populateDockedLists()
 		{
 			comboboxUndocked.Items.Clear();
@@ -160,7 +169,7 @@ namespace Session_windows
 		/// <summary>
 		/// Turn on the eventhandlers to enable messages being shown 
 		/// </summary>
-		void on()
+		void eventsOn()
 		{
 			txtX.TextChanged += txtX_TextChanged;
 			txtY.TextChanged += txtY_TextChanged;
@@ -175,7 +184,7 @@ namespace Session_windows
 		/// <summary>
 		/// Turn off eventhandlers to avoid messages from being shown unnecessarily
 		/// </summary>
-		void off()
+		void eventsOff()
 		{
 			txtX.TextChanged -= txtX_TextChanged;
 			txtY.TextChanged -= txtY_TextChanged;
@@ -204,20 +213,32 @@ namespace Session_windows
 		}
 
 		/// <summary>
+		/// Eventhandler for activewindows menu
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		/// <param name="i">ProcessID of window to show info about</param>
+		static void awEH(object sender, EventArgs e, int i)
+		{
+			WindowInfo wi = new WindowInfo(i);
+			wi.Show();
+		}
+
+		/// <summary>
 		/// Clear list of processes, clear boxes of info and collect info on currently running processes
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
 		void btnGetProcesses_Click(object sender, EventArgs e)
 		{
-			off();
+			eventsOff();
 			clearTextBoxes();
-			lbProcesses.Items.Clear();
-			settings.currentProcessesList = null;
+			lvProcesses.Items.Clear();
+			settings.sessionProcessList = null;
 			currentProcess = null;
 			populateProcesses();
 			btnCreateNew.Enabled = true;
-			on();
+			eventsOn();
 		}
 
 		/// <summary>
@@ -257,7 +278,7 @@ namespace Session_windows
 			currentProcess.Ycoordinate = int.Parse(txtY.Text);
 			currentProcess.Minimized = comboboxMinimized.SelectedIndex + 1;
 
-			if (settings.currentSession != null && lbSessions.SelectedIndex != -1) {
+			if (settings.savedSession != null && lbSessions.SelectedIndex != -1) {
 				ProcessInfo tempProcess = new ProcessInfo(Process.GetProcessById(currentProcess.ID).MainWindowHandle,
 					                          currentProcess.ID,
 					                          currentProcess.ProcessName,
@@ -284,10 +305,9 @@ namespace Session_windows
 		/// <param name="e">Generic EventArgs</param>
 		void btnSaveSession_Click(object sender, EventArgs e)
 		{
-			if (settings.currentSession != null)
+			if (settings.savedSession != null)
 				settings.updateSession();
 			new FileHandler().write(settings);
-			btnSaveSession.Enabled = false;
 		}
 
 		/// <summary>
@@ -301,12 +321,12 @@ namespace Session_windows
 
 			newsession.ShowDialog();
 			if (newsession.DialogResult == DialogResult.OK) {
-				settings.addSession(new Session(newsession.getName(), settings.currentProcessesList));
+				settings.addSession(new Session(newsession.getName(), settings.sessionProcessList));
 
 				lbSessions.Items.Add(newsession.getName());
 				comboboxUndocked.Items.Add(newsession.getName());
 				comboboxDocked.Items.Add(newsession.getName());
-				settings.currentSession = settings.getSession(newsession.getName());
+				settings.savedSession = settings.getSession(newsession.getName());
 				lbSessions.SelectedIndex = lbSessions.FindString(newsession.getName());
 			}
 			new FileHandler().write(settings);
@@ -319,7 +339,7 @@ namespace Session_windows
 		/// <param name="e">Generic EventArgs</param>
 		void btnSetSettings_Click(object sender, EventArgs e)
 		{
-			foreach (ProcessInfo p in settings.currentProcessesList) {
+			foreach (ProcessInfo p in settings.sessionProcessList) {
 				new WindowLayout().setLayout(p);
 			}
 		}
@@ -332,15 +352,15 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void lbProcesses_SelectedIndexChanged(object sender, EventArgs e)
+		void lvProcesses_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (lbProcesses.SelectedIndex == -1) {
+			if (lvProcesses.SelectedItems.Count == 0) {
 				currentProcess = null;
-			} else if (!lbProcesses.SelectedItem.ToString()
-				           .StartsWith("   ")) {
+			} else {
 				ttInfo.Active = false;
-				currentProcess = settings.currentProcessesList.Find(x => x.ProcessName.Equals(lbProcesses.SelectedItem.ToString()));
-				off();
+				string selected = lvProcesses.SelectedItems[0].SubItems[1].Text;
+				currentProcess = settings.sessionProcessList.Find(x => x.ProcessName.Equals(selected));
+				eventsOff();
 
 				if (currentProcess.ID == 0) {
 					txtProcess.Text = currentProcess.ProcessName;
@@ -365,7 +385,7 @@ namespace Session_windows
 					}
 					btnSetProcessInfo.Enabled = true;
 				}
-				on();
+				eventsOn();
 			}
 		}
 
@@ -379,38 +399,39 @@ namespace Session_windows
 		void lbSessions_MouseDown(object sender, MouseEventArgs e)
 		{
 			int index = lbSessions.IndexFromPoint(e.Location);
-			off();
-			lbProcesses.Items.Clear();
+			eventsOff();
+			lvProcesses.Items.Clear();
 			btnCreateNew.Enabled = false;
 			clearTextBoxes();
 			if (index != -1) {
-				settings.setCurrentSession(lbSessions.SelectedItem.ToString());
-				settings.currentProcessesList = null;
-				settings.currentProcessesList = settings.currentSession.Plist;
+				var t = lbSessions.SelectedItem.ToString();
+				settings.setSavedSession(t);
+				settings.sessionProcessList = null;
+				settings.sessionProcessList = settings.savedSession.Plist;
 				currentProcess = null;
 				populateProcesses();
 				btnCreateNew.Enabled = true;
 			}
-			on();
+			eventsOn();
 		}
 
 		/// <summary>
-		/// Used to check if a click in the listbox occured over a listbox item
+		/// Used to check if a click in the listview occured over an item
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic MouseEventArgs</param>
-		void lbProcesses_MouseDown(object sender, MouseEventArgs e)
+		void lvProcesses_MouseDown(object sender, MouseEventArgs e)
 		{
-			int index = lbProcesses.IndexFromPoint(e.Location);
+			ListViewItem item = lvProcesses.GetItemAt(e.X, e.Y);
 
-			if (index == -1) {
-				lbProcesses.SelectedIndex = -1;
-				off();
+			if (item == null) {
+				lvProcesses.SelectedIndices.Clear();
+				eventsOff();
 				clearTextBoxes();
 				currentProcess = null;
 			}
 			if (e.Button == MouseButtons.Right) {
-				lbProcesses.SelectedIndex = index;
+				//lvProcesses.SelectedIndices = item;
 				conmenuDeleteProcess.Show(Cursor.Position);
 				conmenuDeleteProcess.Visible = true;
 			}
@@ -495,13 +516,13 @@ namespace Session_windows
 		/// <param name="e"></param>
 		void contextmenuDeleteProcess_Click(object sender, EventArgs e)
 		{
-			settings.deleteProcessFromSession(settings.currentSession.SessionName, currentProcess);
-			settings.currentSession = settings.getSession(settings.currentSession.SessionName);
-			settings.currentProcessesList = settings.currentSession.Plist;
-			off();
+			settings.deleteProcessFromSession(settings.savedSession.SessionName, currentProcess);
+			settings.savedSession = settings.getSession(settings.savedSession.SessionName);
+			settings.sessionProcessList = settings.savedSession.Plist;
+			eventsOff();
 			clearTextBoxes();
 			populateProcesses();
-			on();
+			eventsOn();
 			new FileHandler().write(settings);
 		}
 
@@ -515,7 +536,7 @@ namespace Session_windows
 			int temp = comboboxMinimized.SelectedIndex;
 			currentProcess.Minimized = comboboxMinimized.SelectedIndex + 1;
 			settings.updateProcess(currentProcess.ProcessName, currentProcess);
-			if (settings.currentSession != null)
+			if (settings.savedSession != null)
 				new FileHandler().write(settings);
 		}
 
@@ -585,8 +606,7 @@ namespace Session_windows
 		{
 			if (conmsActiveWindows.Items.Count < 1) {
 				IEnumerable<Process> listProcesses = Process.GetProcesses()
-					.Where(p => p.MainWindowHandle != IntPtr.Zero &&
-					       p.Id != Process.GetCurrentProcess().Id)
+					.Where(p => p.MainWindowHandle != IntPtr.Zero)
 					.OrderBy(p => p.ProcessName);
 				foreach (Process p in listProcesses) {
 					IntPtr handle = p.MainWindowHandle;
@@ -598,18 +618,6 @@ namespace Session_windows
 				}
 			}
 			conmsActiveWindows.Show(Cursor.Position);
-		}
-
-		/// <summary>
-		/// Eventhandler for activewindows menu
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		/// <param name="i">ProcessID of window to show info about</param>
-		static void awEH(object sender, EventArgs e, int i)
-		{
-			WindowInfo wi = new WindowInfo(i);
-			wi.Show();
 		}
 
 		/// <summary>
