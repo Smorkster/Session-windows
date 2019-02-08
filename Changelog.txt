@@ -1,4 +1,20 @@
-﻿Version 2.4
+﻿Version 3.0
+***********
+Rework of MainForm UI and its functions
+Rework of some of the applications logics
+Renamed some variables for clarifications
+Now shows processes saved in a session, that are not started, in red and italic
+Moved the session that is currently worked on, to MainForm-class
+Name of the currently shown saved session is shown in the text of groupBoxProcesses
+	If no saved session is used, this is changed to "Currently running processes"
+At start, the currently running processes is shown, rather than a saved session
+Added eventfunctionality for starting/terminating processes. This will modify the text in lvProcesses when showing a session
+Removed MainWindowTitle, since it is not being used
+Fixed error when listing processes in saved session, processes with no active window caused a crash
+Added keydown-eventhandler for WindowInfo-form. If Escape is pressed, close the form
+When currently running processes is shown, btnGetRunningProcesses and btnDeleteSession is disabled
+
+Version 2.4
 ***********
 Removed limitation of own ProcessID from WinInfo
 Now fills lbProcesses on start
@@ -7,7 +23,7 @@ Replaced listbox with listview for processes
 btnSaveSession is now enabled as default
 Corrected saving of height and width of windows
 Controls on the righthandside in the mainform now is anchored to rightside of form
-A minimum size of mainform i set
+A minimum size of mainform is set
 
 Version 2.3
 ***********

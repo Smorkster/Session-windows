@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -14,13 +14,13 @@ namespace Session_windows
 	/// </summary>
 	public class FileHandler
 	{
-		FileInfo fi = new FileInfo(@"H:\WindowSession - Test.xml");
+		FileInfo fi = new FileInfo(@"H:\WindowSession.xml");
 
 		/// <summary>
 		/// Collects all process- and sessioninformation to a string and writes to file
 		/// </summary>
 		/// <param name="settings">All settings for sessions and processes</param>
-		public void write (Settings settings)
+		public void write (ref Settings settings)
 		{
 			try
 			{
@@ -56,9 +56,9 @@ namespace Session_windows
 							width = xmlDoc.CreateAttribute("width"),
 							height = xmlDoc.CreateAttribute("height");
 							
-							pWinPl.Value = p.Minimized.ToString();
-							xc.Value = p.Xcoordinate.ToString();
-							yc.Value = p.Ycoordinate.ToString();
+							pWinPl.Value = p.WindowPlacement.ToString();
+							xc.Value = p.XTopCoordinate.ToString();
+							yc.Value = p.YTopCoordinate.ToString();
 							width.Value = p.Width.ToString();
 							height.Value = p.Height.ToString();
 							
@@ -92,52 +92,60 @@ namespace Session_windows
 		public Settings read ()
 		{
 			Settings settings = new Settings();
+			int loop = 0;
 			if (File.Exists(fi.FullName) && !IsFileLocked(fi))
 			{
 				try
 				{
-					XDocument xmlDoc = XDocument.Load(@"H:\WindowSession - Test.xml");
-					Process[] processes;
+					XDocument xmlDoc = XDocument.Load(fi.FullName);
+					Process process = null;
 		
-					foreach (XElement se in xmlDoc.Descendants("session"))
+					foreach (XElement sessionXMLElement in xmlDoc.Descendants("session"))
 					{
-						Session session = new Session();
-						session.SessionName = se.Attribute("name").Value;
-						List<ProcessInfo> pl = new List<ProcessInfo>();
-						foreach (XElement pi in se.Descendants("process"))
+						Session savedSession = new Session();
+						savedSession.SessionName = sessionXMLElement.Attribute("name").Value;
+						List<ProcessInfo> processList = new List<ProcessInfo>();
+						foreach (XElement pInfo in sessionXMLElement.Descendants("process"))
 						{
-							processes = Process.GetProcessesByName(pi.Value);
-							IntPtr h;
-							int id;
-							string wt;
-							if (processes.Length == 0)
-							{
-								h = IntPtr.Zero;
-								id = 0;
-								wt = "";
-							} else
-							{
-								h = processes[0].MainWindowHandle;
-								id = processes[0].Id;
-								wt = processes[0].MainWindowTitle;
+							IntPtr handle;
+							int processID;
+							string windowTitle;
+
+							Process[] ps = Process.GetProcessesByName(pInfo.Value);
+							if (!ps.Any()) {
+								handle = IntPtr.Zero;
+								processID = 0;
+								windowTitle = "";
+							} else {
+								try{
+									process = ps.First(p => p.MainWindowHandle != IntPtr.Zero);
+									handle = process.MainWindowHandle;
+									processID = process.Id;
+									windowTitle = process.MainWindowTitle;
+								} catch {
+									handle = IntPtr.Zero;
+									processID = ps.First().Id;
+									windowTitle = "";
+								}
 							}
-							int x = int.Parse(pi.Attribute("xcoor").Value);
-							int y = int.Parse(pi.Attribute("ycoor").Value);
-							int wi = int.Parse(pi.Attribute("width").Value);
-							int he = int.Parse(pi.Attribute("height").Value);
-							int w = int.Parse(pi.Attribute("winplacement").Value);
-							pl.Add(new ProcessInfo(h,
-								id,
-								pi.Value,
-								wt,
-								x,
-								y,
-								wi,
-								he,
-								w));
-							session.Plist = pl;
+							int xCoordinate = int.Parse(pInfo.Attribute("xcoor").Value);
+							int yCoordinate = int.Parse(pInfo.Attribute("ycoor").Value);
+							int width = int.Parse(pInfo.Attribute("width").Value);
+							int height = int.Parse(pInfo.Attribute("height").Value);
+							int windowPlacement = int.Parse(pInfo.Attribute("winplacement").Value);
+							processList.Add(new ProcessInfo(handle,
+								processID,
+								pInfo.Value,
+								xCoordinate,
+								yCoordinate,
+								width,
+								height,
+								windowPlacement));
+							savedSession.Plist = processList;
+							loop += 1;
 						}
-						settings.addSession(session);
+						settings.addSession(savedSession);
+						process = null;
 					}
 					settings.Docked = xmlDoc.Root.Attribute("docked").Value;
 					settings.Undocked = xmlDoc.Root.Attribute("undocked").Value;
@@ -146,7 +154,8 @@ namespace Session_windows
 					return settings;
 				} catch (Exception e)
 				{
-					MessageBox.Show("Something wrong when reading XML:\n" + e.Message, "");
+					MessageBox.Show("Something wrong when reading XML ("+loop+"):\n" + e.Message, "");
+					return null;
 				}
 			}
 
@@ -167,19 +176,13 @@ namespace Session_windows
 				stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
 			} catch (IOException)
 			{
-				//the file is unavailable because it is:
-				//still being written to
-				//or being processed by another thread
-				//or does not exist (has already been processed)
 				return true;
 			} finally
 			{
 				if (stream != null)
 					stream.Close();
 			}
-
-			//file is not locked
-			return false;
+			return false; // File is not locked
 		}
 	}
 }

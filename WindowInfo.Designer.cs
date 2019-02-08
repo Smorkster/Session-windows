@@ -56,6 +56,7 @@ namespace Session_windows
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "WindowInfo";
 			this.TopMost = true;
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.WindowInfo_KeyDown);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

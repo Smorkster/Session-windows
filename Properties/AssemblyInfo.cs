@@ -8,4 +8,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct ("Session windows")]
 [assembly: AssemblyCopyright ("Copyright 2016")]
 [assembly: ComVisible (false)]
-[assembly: AssemblyVersion ("2.4")]
+[assembly: AssemblyVersion ("3.0")]

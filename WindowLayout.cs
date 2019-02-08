@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Session_windows
 {
 	/// <summary>
-	/// 
+	/// Class for setting the layout of a windowform 
 	/// </summary>
 	public class WindowLayout
 	{
@@ -93,31 +93,32 @@ namespace Session_windows
 
 					GetWindowThreadProcessId(handle, out id);
 					Process p = Process.GetProcessById((int)id);
+					
 					if (p.ProcessName == process.ProcessName)
 					{
-						MoveWindow(handle, process.Xcoordinate, process.Ycoordinate, process.Width, process.Height, true);
-
-						WINDOWPLACEMENT wp = new WINDOWPLACEMENT();
-						wp.length = Marshal.SizeOf(wp);
-						GetWindowPlacement(p.MainWindowHandle, ref wp);
-						switch (process.Minimized)
+						WINDOWPLACEMENT windowPlacement = new WINDOWPLACEMENT();
+						windowPlacement.length = Marshal.SizeOf(windowPlacement);
+						GetWindowPlacement(p.MainWindowHandle, ref windowPlacement);
+						switch (process.WindowPlacement)
 						{
 							case 3:
-								wp.showCmd = ShowWindowCommands.SW_MAXIMIZE;
+								windowPlacement.showCmd = ShowWindowCommands.SW_MAXIMIZE;
 								break;
 							case 2:
-								wp.showCmd = ShowWindowCommands.SW_SHOWMINIMIZED;
+								windowPlacement.showCmd = ShowWindowCommands.SW_SHOWMINIMIZED;
 								break;
 							default:
-								wp.showCmd = ShowWindowCommands.SW_SHOWNORMAL;
+								windowPlacement.showCmd = ShowWindowCommands.SW_SHOWNORMAL;
 								break;
 						}
-						SetWindowPlacement(handle, ref wp);
+						SetWindowPlacement(handle, ref windowPlacement);
+						if(windowPlacement.showCmd == ShowWindowCommands.SW_SHOWNORMAL)
+							MoveWindow(handle, process.XTopCoordinate, process.YTopCoordinate, process.Width, process.Height, true);
 					}
 				}
 			} catch (ArgumentException e)
 			{
-				MessageBox.Show("No process with id " + process.ID + " is running.\n" + e.Message);
+				MessageBox.Show("No process with id " + process.ProcessID + " is running.\n" + e.Message);
 			}
 		}
 
