@@ -69,6 +69,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExcludedApplications.cs" />
+    <Compile Include="ExcludedApplications.Designer.cs">
+      <DependentUpon>ExcludedApplications.cs</DependentUpon>
+    </Compile>
     <Compile Include="FileHandler.cs" />
     <Compile Include="MainForm.cs" />
     <Compile Include="MainForm.Designer.cs">
@@ -102,6 +106,9 @@
     <None Include="Changelog.txt" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ExcludedApplications.resx">
+      <DependentUpon>ExcludedApplications.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

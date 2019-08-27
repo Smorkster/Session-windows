@@ -3,17 +3,22 @@ using System.Windows.Forms;
 
 namespace Session_windows
 {
-
 	public partial class NewSessionName : Form
 	{
-		public NewSessionName()
+		public NewSessionName(string[] sessionNames)
 		{
 			InitializeComponent();
 			ActiveControl = txtSessionName;
+			AutoCompleteStringCollection autocomplete = new AutoCompleteStringCollection();
+			foreach (string name in sessionNames)
+			{
+				autocomplete.Add(name);
+			}
+			txtSessionName.AutoCompleteCustomSource = autocomplete;
 		}
 
 		/// <summary>
-		/// User have entered a name and wants to use it for the session
+		/// Name is given, button to save session is pressed
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
@@ -24,7 +29,7 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// User wants to cancel naming the session
+		/// Button to cancel naming the session was pressed
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
@@ -58,6 +63,20 @@ namespace Session_windows
 		public string getName()
 		{
 			return txtSessionName.Text;
+		}
+
+		/// <summary>
+		/// Controls if name is already existing
+		/// If so, disable button for save
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void txtSessionName_TextChanged(object sender, EventArgs e)
+		{
+			if (txtSessionName.AutoCompleteCustomSource.Contains(txtSessionName.Text))
+			{
+				btnSave.Enabled = false;
+			}
 		}
 	}
 }

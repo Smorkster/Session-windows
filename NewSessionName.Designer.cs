@@ -49,7 +49,7 @@ namespace Session_windows
 			// 
 			// btnCancel
 			// 
-			this.btnCancel.Location = new System.Drawing.Point(196, 41);
+			this.btnCancel.Location = new System.Drawing.Point(348, 10);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 1;
@@ -59,21 +59,25 @@ namespace Session_windows
 			// 
 			// txtSessionName
 			// 
+			this.txtSessionName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+			this.txtSessionName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
 			this.txtSessionName.Location = new System.Drawing.Point(12, 12);
 			this.txtSessionName.Name = "txtSessionName";
 			this.txtSessionName.Size = new System.Drawing.Size(249, 20);
 			this.txtSessionName.TabIndex = 2;
+			this.txtSessionName.TextChanged += new System.EventHandler(this.txtSessionName_TextChanged);
 			// 
-			// SessionName
+			// NewSessionName
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(354, 42);
+			this.ClientSize = new System.Drawing.Size(431, 42);
+			this.ControlBox = false;
 			this.Controls.Add(this.txtSessionName);
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnSave);
-			this.Name = "SessionName";
+			this.Name = "NewSessionName";
 			this.Text = "SessionName";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SessionName_FormClosing);
 			this.ResumeLayout(false);

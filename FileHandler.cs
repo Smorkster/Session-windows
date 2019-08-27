@@ -14,7 +14,7 @@ namespace Session_windows
 	/// </summary>
 	public class FileHandler
 	{
-		FileInfo fi = new FileInfo(@"H:\WindowSession.xml");
+		FileInfo settingsFile = new FileInfo(@"H:\WindowSession.xml");
 
 		/// <summary>
 		/// Collects all process- and sessioninformation to a string and writes to file
@@ -24,7 +24,7 @@ namespace Session_windows
 		{
 			try
 			{
-				if (!IsFileLocked(fi))
+				if (!IsFileLocked(settingsFile))
 				{
 					XmlDocument xmlDoc = new XmlDocument();
 					XmlNode rootNode = xmlDoc.CreateElement("sessions");
@@ -40,41 +40,59 @@ namespace Session_windows
 					rootNode.Attributes.Append(startsystray);
 					xmlDoc.AppendChild(rootNode);
 					
+					List<string> excludedApps = settings.getExcludedApps();
+
+					XmlNode xmlExcludedAppsList = xmlDoc.CreateElement("excludedAppsList");
+					foreach (string app in excludedApps)
+					{
+						XmlNode xmlExcludedApp = xmlDoc.CreateElement("excludedApp");
+						xmlExcludedApp.InnerText = app;
+						xmlExcludedAppsList.AppendChild(xmlExcludedApp);
+					}
+					rootNode.AppendChild(xmlExcludedAppsList);
+
 					foreach (string s in settings.getSessionList())
 					{
 						Session session = settings.getSession(s);
 						XmlNode sessionNode = xmlDoc.CreateElement("session");
-						XmlAttribute attributeSName = xmlDoc.CreateAttribute("name");
-						attributeSName.Value = session.SessionName;
-						sessionNode.Attributes.Append(attributeSName);
+						XmlAttribute attributeSessionName = xmlDoc.CreateAttribute("name");
+						XmlAttribute attributeTaskbarVisible = xmlDoc.CreateAttribute("taskbarVisible");
+
+						attributeSessionName.Value = session.SessionName;
+						sessionNode.Attributes.Append(attributeSessionName);
+						attributeTaskbarVisible.Value = session.TaskbarVisible.ToString();
+						sessionNode.Attributes.Append(attributeTaskbarVisible);
 						foreach (ProcessInfo p in session.Plist)
 						{
-							XmlNode processNode = xmlDoc.CreateElement("process");
-							XmlAttribute pWinPl = xmlDoc.CreateAttribute("winplacement"),
-							xc = xmlDoc.CreateAttribute("xcoor"),
-							yc = xmlDoc.CreateAttribute("ycoor"),
-							width = xmlDoc.CreateAttribute("width"),
-							height = xmlDoc.CreateAttribute("height");
-							
-							pWinPl.Value = p.WindowPlacement.ToString();
-							xc.Value = p.XTopCoordinate.ToString();
-							yc.Value = p.YTopCoordinate.ToString();
-							width.Value = p.Width.ToString();
-							height.Value = p.Height.ToString();
-							
-							processNode.Attributes.Append(pWinPl);
-							processNode.Attributes.Append(xc);
-							processNode.Attributes.Append(yc);
-							processNode.Attributes.Append(width);
-							processNode.Attributes.Append(height);
-							
-							processNode.InnerText = p.ProcessName;
-							
-							sessionNode.AppendChild(processNode);
+							if (!settings.isExcludedApp(p.ProcessName))
+							{
+								XmlNode processNode = xmlDoc.CreateElement("process");
+								XmlAttribute pWinPl = xmlDoc.CreateAttribute("winplacement"),
+								xc = xmlDoc.CreateAttribute("xcoor"),
+								yc = xmlDoc.CreateAttribute("ycoor"),
+								width = xmlDoc.CreateAttribute("width"),
+								height = xmlDoc.CreateAttribute("height");
+								
+								pWinPl.Value = p.WindowPlacement.ToString();
+								xc.Value = p.XTopCoordinate.ToString();
+								yc.Value = p.YTopCoordinate.ToString();
+								width.Value = p.Width.ToString();
+								height.Value = p.Height.ToString();
+								
+								processNode.Attributes.Append(pWinPl);
+								processNode.Attributes.Append(xc);
+								processNode.Attributes.Append(yc);
+								processNode.Attributes.Append(width);
+								processNode.Attributes.Append(height);
+								
+								processNode.InnerText = p.ProcessName;
+								
+								sessionNode.AppendChild(processNode);
+							}
 						}
 						rootNode.AppendChild(sessionNode);
 					}
-					xmlDoc.Save(@"H:\WindowSession - Test.xml");
+					xmlDoc.Save(@"H:\WindowSession.xml");
 				} else
 				{
 					MessageBox.Show("Can't open file for writing. Might be open in another process", "Error opening XML-file");
@@ -92,18 +110,26 @@ namespace Session_windows
 		public Settings read ()
 		{
 			Settings settings = new Settings();
-			int loop = 0;
-			if (File.Exists(fi.FullName) && !IsFileLocked(fi))
+			string loop="";
+			if (File.Exists(settingsFile.FullName) && !IsFileLocked(settingsFile))
 			{
+				XDocument xmlDoc;
+				Process process;
+				List<string> excludeList;
+				Session savedSession;
+
 				try
 				{
-					XDocument xmlDoc = XDocument.Load(fi.FullName);
-					Process process = null;
+					xmlDoc = XDocument.Load(settingsFile.FullName);
+					process = null;
+					excludeList = new List<string>();
 		
 					foreach (XElement sessionXMLElement in xmlDoc.Descendants("session"))
 					{
-						Session savedSession = new Session();
+						savedSession = new Session();
 						savedSession.SessionName = sessionXMLElement.Attribute("name").Value;
+						if(sessionXMLElement.Attribute("taskbarVisible") != null)
+							savedSession.TaskbarVisible = sessionXMLElement.Attribute("taskbarVisible").Value == "True";
 						List<ProcessInfo> processList = new List<ProcessInfo>();
 						foreach (XElement pInfo in sessionXMLElement.Descendants("process"))
 						{
@@ -142,21 +168,31 @@ namespace Session_windows
 								height,
 								windowPlacement));
 							savedSession.Plist = processList;
-							loop += 1;
+							loop = sessionXMLElement.Attribute("name").Value + " " + pInfo.Value;
 						}
 						settings.addSession(savedSession);
 						process = null;
+						loop = "Done";
 					}
-					settings.Docked = xmlDoc.Root.Attribute("docked").Value;
-					settings.Undocked = xmlDoc.Root.Attribute("undocked").Value;
-					settings.StartInSysTray = Convert.ToBoolean(int.Parse(xmlDoc.Root.Attribute("startsystray").Value));
 
-					return settings;
+					XElement xmlExcludedAppsList = xmlDoc.Descendants("excludedAppsList").First();
+					foreach (XElement xmlExcludedApp in xmlExcludedAppsList.Descendants("excludedApp"))
+					{
+						excludeList.Add(xmlExcludedApp.Value);
+					}
+
 				} catch (Exception e)
 				{
-					MessageBox.Show("Something wrong when reading XML ("+loop+"):\n" + e.Message, "");
+					MessageBox.Show("Something wrong when reading XML (" + loop + "):\n" + e.Message, "");
 					return null;
 				}
+
+				settings.Docked = xmlDoc.Root.Attribute("docked").Value;
+				settings.Undocked = xmlDoc.Root.Attribute("undocked").Value;
+				settings.StartInSysTray = Convert.ToBoolean(int.Parse(xmlDoc.Root.Attribute("startsystray").Value));
+				settings.replaceExcludedApplicationsList(excludeList);
+
+				return settings;
 			}
 
 			return null;

@@ -1,4 +1,30 @@
-﻿Version 3.0
+﻿Version 3.1
+***********
+Closing the mainform, now properly closes application
+btnGetRunningProcesses is now always enabled
+Added button to remove currently marked process from session
+Session name is now shown above processlist when a session is saved
+Renamed fi to settingsFile in FileHandler.cs for clarity
+Renamed currentProcess to markedProcess in MainForm.cs for clarity
+Renamed activeProcesses to runningProcesses in MainForm.cs for clarity
+Renamed activeProcess to process in MainForm.cs for clarity
+Filling the processlist is now quicker
+Removed eventhandler for process start/termination
+Removed need for processname when updating process in session
+New function getProcess in session
+Removed button for saving to an existng sessionname
+activeSession in MainForm.cs is now a string with the name of loaded session
+New currentlyRunningProcesses in Settings, holds the currently running processes
+Marking a process in session with not started application, changes txtid fontstyle and backcolor
+WinInfo now shows information i textboxes
+Name of new session is now being checked if it exists before saving
+Added comment for WindowPlacement on WindowInfo
+Some remodeling of controls in WindowInfo
+Added functionality for how taskbar is visible in a session
+New function in session to apply its settings
+New functionality to exclude application
+
+Version 3.0
 ***********
 Rework of MainForm UI and its functions
 Rework of some of the applications logics

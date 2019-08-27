@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Session_windows
@@ -66,8 +65,11 @@ namespace Session_windows
 			public int bottom;
 			public int placement;
 			public string placementName;
+			public string placementComment;
 		}
 		WINDOWPLACEMENT placement;
+		Timer timer;
+		Process process;
 
 		/// <summary>
 		/// Construct
@@ -76,40 +78,49 @@ namespace Session_windows
 		public WindowInfo(int processID)
 		{
 			InitializeComponent();
-			Process process = Process.GetProcessById(processID);
+			process = Process.GetProcessById(processID);
 			RECT pos = position(process.MainWindowHandle);
 			Text += " for " + process.ProcessName;
 			IntPtr processHandle = process.Handle;
+			timer = new Timer();
 
-			label1.Text = "Processname: " + process.ProcessName + "\n";
-			label1.Text += "Process file name: " + process.MainModule.FileName + "\n";
-			label1.Text += "MainWindowTitle: " + (process.MainWindowTitle.Equals("") ? "Process: " + process.ProcessName : process.MainWindowTitle) + "\n";
-			label1.Text += "ProcessID: " + processID + "\n";
-			label1.Text += "X coordinate top: " + pos.left + "\n";
-			label1.Text += "Y coordinate top: " + pos.top + "\n";
-			label1.Text += "X coordinate bottom: " + pos.right + " (width " + (pos.right - pos.left) + ")" + "\n";
-			label1.Text += "Y coordinate bottom: " + pos.bottom + " (height " + (pos.bottom - pos.top) + ")" + "\n";
-			label1.Text += "WindowPlacement: " + pos.placement + " (" + pos.placementName + ")" + "\n";
-			label1.Text += "Starttime: " + process.StartTime + "\n";
-			label1.Text += "Processor time: " + process.TotalProcessorTime + "\n";
-			label1.Text += "User time: " + process.UserProcessorTime + "\n";
-			label1.Text += "Privileged time: " + process.PrivilegedProcessorTime + "\n";
-			label1.Text += "BasePriority: " + process.BasePriority + " (" + prio(process.BasePriority) + ")" + "\n";
-			label1.Text += "MaxWorkingSet: " + (double)process.MaxWorkingSet + "\n";
-			label1.Text += "MinWorkingSet: " + (double)process.MinWorkingSet + "\n";
-			label1.Text += "Working Set: " + (double)process.WorkingSet64 + "\n";
-			label1.Text += "Non-paged Memory Size: " + (double)process.NonpagedSystemMemorySize64 + "\n";
-			label1.Text += "Paged Memory Size: " + (double)process.PagedMemorySize64 + "\n";
-			label1.Text += "Paged System Memory Size: " + (double)process.PagedSystemMemorySize64 + "\n";
-			label1.Text += "Peak Paged Memory Size: " + (double)process.PeakPagedMemorySize64 + "\n";
-			label1.Text += "Peak Virtual Memory Size: " + (double)process.PeakVirtualMemorySize64 + "\n";
-			label1.Text += "Peak Working Set: " + (double)process.PeakWorkingSet64 + "\n";
-			label1.Text += "Virtual Memory Size: " + (double)process.VirtualMemorySize64 + "\n";
-			label1.Text += "SessionID: " + process.SessionId + "\n";
-			label1.Text += "Startinfo: " + "\n    UserName: " + process.StartInfo.UserName + "\n" +
-			"    FileName: " + process.StartInfo.FileName + "\n" +
-			"    WorkingDirectory: " + process.StartInfo.WorkingDirectory + "\n";
-			label1.Text += "Thread 1 - ID: " + process.Threads[0].Id;
+			timer.Tick += tickOccured;
+			timer.Interval = 10;
+			timer.Start();
+
+			txtProcessName.Text = process.ProcessName;
+			try {
+				txtMainModuleFileName.Text = process.MainModule.FileName;
+			} catch (Exception e) {
+				txtMainModuleFileName.Font = new Font(Font, FontStyle.Italic);
+				txtMainModuleFileName.Text = e.Message;
+			}
+			txtMainWindowTitle.Text = process.MainWindowTitle.Equals("") ? process.ProcessName : process.MainWindowTitle;
+			txtProcessID.Text = processID.ToString();
+			txtXCoordinateTop.Text = pos.left.ToString();
+			txtYCoordinateTop.Text = pos.top.ToString();
+			txtXCoordinateBottom.Text = pos.right + " (width " + (pos.right - pos.left) + ")";
+			txtYCoordinateBottom.Text = pos.bottom + " (height " + (pos.bottom - pos.top) + ")";
+			txtWindowPlacement.Text = pos.placement + " (" + pos.placementName + ")";
+			txtWindowPlacementComment.Text = pos.placementComment;
+			txtStarttime.Text = process.StartTime.ToLongDateString() + " "+ process.StartTime.ToLongTimeString();
+			txtBasePriority.Text = process.BasePriority + " (" + prio(process.BasePriority) + ")";
+			txtMaxWorkingSet.Text = ((double)process.MaxWorkingSet).ToString();
+			txtMinWorkingSet.Text = ((double)process.MinWorkingSet).ToString();
+			txtWorkingSet.Text = ((double)process.WorkingSet64).ToString();
+			txtNonPagedMemorySize.Text = ((double)process.NonpagedSystemMemorySize64).ToString();
+			txtPagedMemorySize.Text = ((double)process.PagedMemorySize64).ToString();
+			txtPagedSystemMemorySize.Text = ((double)process.PagedSystemMemorySize64).ToString();
+			txtPeakPagedMemorySize.Text = ((double)process.PeakPagedMemorySize64).ToString();
+			txtPeakVirtualMemorySize.Text = ((double)process.PeakVirtualMemorySize64).ToString();
+			txtPeakWorkingSet.Text = ((double)process.PeakWorkingSet64).ToString();
+			txtVirtualMemorySize.Text = ((double)process.VirtualMemorySize64).ToString();
+			txtSessionID.Text = process.SessionId.ToString();
+			txtStartinfoUserName.Text = process.StartInfo.UserName;
+			txtStartinfoFileName.Text = process.StartInfo.FileName;
+			txtStartinfoWorkingDirectory.Text = process.StartInfo.WorkingDirectory;
+			txtThread1ID.Text = process.Threads[0].Id.ToString();
+			ActiveControl = txtProcessName;
 		}
 
 		/// <summary>
@@ -128,46 +139,45 @@ namespace Session_windows
 			}
 			switch (Rect.placement) {
 				case 0:
-					// Hides the window and activates another window.
 					Rect.placementName = "SW_HIDE";
+					Rect.placementComment = "Hides the window and activates another window.";
 					break;
 				case 1:
-					// Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position.
-					// An application should specify this flag when displaying the window for the first time.
 					Rect.placementName = "SW_SHOWNORMAL";
+					Rect.placementComment = "Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. \n\rAn application should specify this flag when displaying the window for the first time.";
 					break;
 				case 2:
-					// Activates the window and displays it as a minimized window.
 					Rect.placementName = "SW_SHOWMINIMIZED";
+					Rect.placementComment = "Activates the window and displays it as a minimized window.";
 					break;
 				case 3:
-					// Activates the window and displays it as a maximized window.
 					Rect.placementName = "SW_SHOWMAXIMIZED";
+					Rect.placementComment = "Activates the window and displays it as a maximized window.";
 					break;
 				case 4:
-					// Displays a window in its most recent size and position.
 					Rect.placementName = "SW_SHOWNOACTIVATE";
+					Rect.placementComment = "Displays a window in its most recent size and position.";
 					break;
-				case 5:
-					// Activates the window and displays it in its current size and position. 
+				case 5: 
 					Rect.placementName = "SW_SHOW";
+					Rect.placementComment = "Activates the window and displays it in its current size and position.";
 					break;
 				case 6:
-					// Minimizes the specified window and activates the next top-level window in the z-order.
 					Rect.placementName = "SW_MINIMIZE";
+					Rect.placementComment = "Minimizes the specified window and activates the next top-level window in the z-order.";
 					break;
 				case 7:
-					// Displays the window as a minimized window.
 					Rect.placementName = "SW_SHOWMINNOACTIVE";
+					Rect.placementComment = "Displays the window as a minimized window.";
 					break;
 				case 8:
-					// Displays the window in its current size and position. 
 					Rect.placementName = "SW_SHOWNA";
+					Rect.placementComment = "Displays the window in its current size and position.";
 					break;
 				case 9:
-					// Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.
-					// An application should specify this flag when restoring a minimized window.
+
 					Rect.placementName = "SW_RESTORE";
+					Rect.placementComment = "Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.\n\rAn application should specify this flag when restoring a minimized window.";
 					break;
 			}
 			return Rect;
@@ -213,6 +223,22 @@ namespace Session_windows
 		{
 			if (e.KeyCode.Equals(Keys.Escape))
 				Close();
+		}
+
+		void tickOccured(object sender, EventArgs e)
+		{
+			txtProcessorTime.Text = process.TotalProcessorTime.Days + " days, " + process.TotalProcessorTime.Hours + " hours, " + process.TotalProcessorTime.Minutes + " minutes, " + process.TotalProcessorTime.Seconds + " seconds, " + process.TotalProcessorTime.Milliseconds + " milliseconds";
+			//txtProcessorTime.Text = process.TotalProcessorTime.ToString();
+			txtUserTime.Text = process.UserProcessorTime.Days + " days, " + process.UserProcessorTime.Hours + " hours, " + process.UserProcessorTime.Minutes + " minutes, " + process.UserProcessorTime.Seconds + " seconds, " + process.UserProcessorTime.Milliseconds + " milliseconds";
+			//txtUserTime.Text = process.UserProcessorTime.ToString();
+			txtPrivilegedTime.Text = process.PrivilegedProcessorTime.Days + " days, " + process.PrivilegedProcessorTime.Hours + " hours, " + process.PrivilegedProcessorTime.Minutes + " minutes, " + process.PrivilegedProcessorTime.Seconds + " seconds, " + process.PrivilegedProcessorTime.Milliseconds + " milliseconds";
+			//txtPrivilegedTime.Text = process.PrivilegedProcessorTime.ToString();
+		}
+
+		void WindowInfo_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			timer.Stop();
+			timer.Tick -= tickOccured;
 		}
 	}
 }
