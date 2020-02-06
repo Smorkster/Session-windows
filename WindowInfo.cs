@@ -9,15 +9,8 @@ namespace Session_windows
 	/// <summary>
 	/// Defines a window showing as much info as possible about a process and its mainwindow     
 	/// </summary>
-	public partial class WindowInfo : Form
+	internal partial class WindowInfo : Form
 	{
-		[DllImport("user32.dll")]
-		static extern bool GetWindowRect(IntPtr hWnd, ref RECT Rect);
-
-		[DllImport("user32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		internal static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
-
 		/// <summary>
 		/// Enumeration of available windowcommands for WINDOWPLACEMENT
 		/// </summary>
@@ -53,21 +46,7 @@ namespace Session_windows
 			public Rectangle rcNormalPosition;
 		}
 
-		/// <summary>
-		/// Struct for windowcoordinates
-		/// </summary>
-		[StructLayout(LayoutKind.Sequential)]
-		public struct RECT
-		{
-			public int left;
-			public int top;
-			public int right;
-			public int bottom;
-			public int placement;
-			public string placementName;
-			public string placementComment;
-		}
-		WINDOWPLACEMENT placement;
+		NativeMethods.WINDOWPLACEMENT placement;
 		Timer timer;
 		Process process;
 
@@ -75,17 +54,17 @@ namespace Session_windows
 		/// Construct
 		/// </summary>
 		/// <param name="processID">ID of the process to show</param>
-		public WindowInfo(int processID)
+		internal WindowInfo(int processId)
 		{
 			InitializeComponent();
-			process = Process.GetProcessById(processID);
-			RECT pos = position(process.MainWindowHandle);
+			process = Process.GetProcessById(processId);
+			NativeMethods.RECT windowRectangle = Position(process.MainWindowHandle);
 			Text += " for " + process.ProcessName;
 			IntPtr processHandle = process.Handle;
 			timer = new Timer();
 
-			timer.Tick += tickOccured;
-			timer.Interval = 10;
+			timer.Tick += TickOccured;
+			timer.Interval = 100;
 			timer.Start();
 
 			txtProcessName.Text = process.ProcessName;
@@ -96,15 +75,15 @@ namespace Session_windows
 				txtMainModuleFileName.Text = e.Message;
 			}
 			txtMainWindowTitle.Text = process.MainWindowTitle.Equals("") ? process.ProcessName : process.MainWindowTitle;
-			txtProcessID.Text = processID.ToString();
-			txtXCoordinateTop.Text = pos.left.ToString();
-			txtYCoordinateTop.Text = pos.top.ToString();
-			txtXCoordinateBottom.Text = pos.right + " (width " + (pos.right - pos.left) + ")";
-			txtYCoordinateBottom.Text = pos.bottom + " (height " + (pos.bottom - pos.top) + ")";
-			txtWindowPlacement.Text = pos.placement + " (" + pos.placementName + ")";
-			txtWindowPlacementComment.Text = pos.placementComment;
+			txtProcessID.Text = processId.ToString();
+			txtXCoordinateTop.Text = windowRectangle.left.ToString();
+			txtYCoordinateTop.Text = windowRectangle.top.ToString();
+			txtXCoordinateBottom.Text = windowRectangle.right + " (width " + (windowRectangle.right - windowRectangle.left) + ")";
+			txtYCoordinateBottom.Text = windowRectangle.bottom + " (height " + (windowRectangle.bottom - windowRectangle.top) + ")";
+			txtWindowPlacement.Text = windowRectangle.placement + " (" + windowRectangle.placementName + ")";
+			txtWindowPlacementComment.Text = windowRectangle.placementComment;
 			txtStarttime.Text = process.StartTime.ToLongDateString() + " "+ process.StartTime.ToLongTimeString();
-			txtBasePriority.Text = process.BasePriority + " (" + prio(process.BasePriority) + ")";
+			txtBasePriority.Text = process.BasePriority + " (" + Prio(process.BasePriority) + ")";
 			txtMaxWorkingSet.Text = ((double)process.MaxWorkingSet).ToString();
 			txtMinWorkingSet.Text = ((double)process.MinWorkingSet).ToString();
 			txtWorkingSet.Text = ((double)process.WorkingSet64).ToString();
@@ -124,63 +103,64 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// Returns the windowplacement of a window
+		/// Gets the window placementstyle, size and position 
 		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		RECT position(IntPtr id)
+		/// <param name="windowHandle">Handle of window to check</param>
+		/// <returns>Windowplacement-style of target window</returns>
+		internal NativeMethods.RECT Position(IntPtr windowHandle)
 		{
-			RECT Rect = new RECT();
+			NativeMethods.RECT windowRect = new NativeMethods.RECT();
 
 			placement.length = Marshal.SizeOf(placement);
-			if (GetWindowRect(id, ref Rect)) {
-				GetWindowPlacement(id, ref placement);
-				Rect.placement = (int)placement.showCmd;
+			if (NativeMethods.GetWindowRect(windowHandle, ref windowRect))
+			{
+				NativeMethods.GetWindowPlacement(windowHandle, ref placement);
+				windowRect.placement = (int)placement.showCmd;
 			}
-			switch (Rect.placement) {
+			switch (windowRect.placement)
+			{
 				case 0:
-					Rect.placementName = "SW_HIDE";
-					Rect.placementComment = "Hides the window and activates another window.";
+					windowRect.placementName = "SW_HIDE";
+					windowRect.placementComment = "Hides the window and activates another window.";
 					break;
 				case 1:
-					Rect.placementName = "SW_SHOWNORMAL";
-					Rect.placementComment = "Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. \n\rAn application should specify this flag when displaying the window for the first time.";
+					windowRect.placementName = "SW_SHOWNORMAL";
+					windowRect.placementComment = "Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. \n\rAn application should specify this flag when displaying the window for the first time.";
 					break;
 				case 2:
-					Rect.placementName = "SW_SHOWMINIMIZED";
-					Rect.placementComment = "Activates the window and displays it as a minimized window.";
+					windowRect.placementName = "SW_SHOWMINIMIZED";
+					windowRect.placementComment = "Activates the window and displays it as a minimized window.";
 					break;
 				case 3:
-					Rect.placementName = "SW_SHOWMAXIMIZED";
-					Rect.placementComment = "Activates the window and displays it as a maximized window.";
+					windowRect.placementName = "SW_SHOWMAXIMIZED";
+					windowRect.placementComment = "Activates the window and displays it as a maximized window.";
 					break;
 				case 4:
-					Rect.placementName = "SW_SHOWNOACTIVATE";
-					Rect.placementComment = "Displays a window in its most recent size and position.";
+					windowRect.placementName = "SW_SHOWNOACTIVATE";
+					windowRect.placementComment = "Displays a window in its most recent size and position.";
 					break;
-				case 5: 
-					Rect.placementName = "SW_SHOW";
-					Rect.placementComment = "Activates the window and displays it in its current size and position.";
+				case 5:
+					windowRect.placementName = "SW_SHOW";
+					windowRect.placementComment = "Activates the window and displays it in its current size and position.";
 					break;
 				case 6:
-					Rect.placementName = "SW_MINIMIZE";
-					Rect.placementComment = "Minimizes the specified window and activates the next top-level window in the z-order.";
+					windowRect.placementName = "SW_MINIMIZE";
+					windowRect.placementComment = "Minimizes the specified window and activates the next top-level window in the z-order.";
 					break;
 				case 7:
-					Rect.placementName = "SW_SHOWMINNOACTIVE";
-					Rect.placementComment = "Displays the window as a minimized window.";
+					windowRect.placementName = "SW_SHOWMINNOACTIVE";
+					windowRect.placementComment = "Displays the window as a minimized window.";
 					break;
 				case 8:
-					Rect.placementName = "SW_SHOWNA";
-					Rect.placementComment = "Displays the window in its current size and position.";
+					windowRect.placementName = "SW_SHOWNA";
+					windowRect.placementComment = "Displays the window in its current size and position.";
 					break;
 				case 9:
-
-					Rect.placementName = "SW_RESTORE";
-					Rect.placementComment = "Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.\n\rAn application should specify this flag when restoring a minimized window.";
+					windowRect.placementName = "SW_RESTORE";
+					windowRect.placementComment = "Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.\n\rAn application should specify this flag when restoring a minimized window.";
 					break;
 			}
-			return Rect;
+			return windowRect;
 		}
 
 		/// <summary>
@@ -188,7 +168,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="basePriority">BasePriority to describe</param>
 		/// <returns>Description of basepriority</returns>
-		string prio(int basePriority)
+		string Prio(int basePriority)
 		{
 			string r = "";
 			switch (basePriority) {
@@ -225,20 +205,34 @@ namespace Session_windows
 				Close();
 		}
 
-		void tickOccured(object sender, EventArgs e)
+		/// <summary>
+		/// Timeintervall for timer have looped
+		/// Update textboxes at each tick
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void TickOccured(object sender, EventArgs e)
 		{
+			TimeSpan running = DateTime.Now - process.StartTime;
+
+			txtTimeRunning.Text = running.Days + " days, " + running.Hours + " hours, " + running.Minutes + " minutes, " + running.Seconds + " seconds";
 			txtProcessorTime.Text = process.TotalProcessorTime.Days + " days, " + process.TotalProcessorTime.Hours + " hours, " + process.TotalProcessorTime.Minutes + " minutes, " + process.TotalProcessorTime.Seconds + " seconds, " + process.TotalProcessorTime.Milliseconds + " milliseconds";
-			//txtProcessorTime.Text = process.TotalProcessorTime.ToString();
 			txtUserTime.Text = process.UserProcessorTime.Days + " days, " + process.UserProcessorTime.Hours + " hours, " + process.UserProcessorTime.Minutes + " minutes, " + process.UserProcessorTime.Seconds + " seconds, " + process.UserProcessorTime.Milliseconds + " milliseconds";
-			//txtUserTime.Text = process.UserProcessorTime.ToString();
 			txtPrivilegedTime.Text = process.PrivilegedProcessorTime.Days + " days, " + process.PrivilegedProcessorTime.Hours + " hours, " + process.PrivilegedProcessorTime.Minutes + " minutes, " + process.PrivilegedProcessorTime.Seconds + " seconds, " + process.PrivilegedProcessorTime.Milliseconds + " milliseconds";
-			//txtPrivilegedTime.Text = process.PrivilegedProcessorTime.ToString();
 		}
 
+		/// <summary>
+		/// Form is closing
+		/// Stop timer and decouple the event for ticks
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic FormClosingEventArgs</param>
 		void WindowInfo_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			timer.Stop();
-			timer.Tick -= tickOccured;
+			timer.Tick -= TickOccured;
+			timer.Dispose();
+			Dispose();
 		}
 	}
 }

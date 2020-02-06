@@ -154,6 +154,8 @@ namespace Session_windows
 			this.label31 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label32 = new System.Windows.Forms.Label();
+			this.txtTimeRunning = new System.Windows.Forms.TextBox();
+			this.label8 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -302,7 +304,7 @@ namespace Session_windows
 			// 
 			// txtProcessorTime
 			// 
-			this.txtProcessorTime.Location = new System.Drawing.Point(170, 255);
+			this.txtProcessorTime.Location = new System.Drawing.Point(170, 275);
 			this.txtProcessorTime.Name = "txtProcessorTime";
 			this.txtProcessorTime.ReadOnly = true;
 			this.txtProcessorTime.Size = new System.Drawing.Size(281, 20);
@@ -310,7 +312,7 @@ namespace Session_windows
 			// 
 			// label11
 			// 
-			this.label11.Location = new System.Drawing.Point(13, 258);
+			this.label11.Location = new System.Drawing.Point(13, 278);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(151, 23);
 			this.label11.TabIndex = 20;
@@ -318,7 +320,7 @@ namespace Session_windows
 			// 
 			// txtUserTime
 			// 
-			this.txtUserTime.Location = new System.Drawing.Point(170, 278);
+			this.txtUserTime.Location = new System.Drawing.Point(170, 298);
 			this.txtUserTime.Name = "txtUserTime";
 			this.txtUserTime.ReadOnly = true;
 			this.txtUserTime.Size = new System.Drawing.Size(281, 20);
@@ -326,7 +328,7 @@ namespace Session_windows
 			// 
 			// label12
 			// 
-			this.label12.Location = new System.Drawing.Point(13, 281);
+			this.label12.Location = new System.Drawing.Point(13, 301);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(151, 23);
 			this.label12.TabIndex = 22;
@@ -334,7 +336,7 @@ namespace Session_windows
 			// 
 			// txtPrivilegedTime
 			// 
-			this.txtPrivilegedTime.Location = new System.Drawing.Point(170, 301);
+			this.txtPrivilegedTime.Location = new System.Drawing.Point(170, 321);
 			this.txtPrivilegedTime.Name = "txtPrivilegedTime";
 			this.txtPrivilegedTime.ReadOnly = true;
 			this.txtPrivilegedTime.Size = new System.Drawing.Size(281, 20);
@@ -342,7 +344,7 @@ namespace Session_windows
 			// 
 			// label13
 			// 
-			this.label13.Location = new System.Drawing.Point(13, 304);
+			this.label13.Location = new System.Drawing.Point(13, 324);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(151, 23);
 			this.label13.TabIndex = 24;
@@ -350,7 +352,7 @@ namespace Session_windows
 			// 
 			// txtBasePriority
 			// 
-			this.txtBasePriority.Location = new System.Drawing.Point(170, 327);
+			this.txtBasePriority.Location = new System.Drawing.Point(170, 347);
 			this.txtBasePriority.Name = "txtBasePriority";
 			this.txtBasePriority.ReadOnly = true;
 			this.txtBasePriority.Size = new System.Drawing.Size(281, 20);
@@ -358,7 +360,7 @@ namespace Session_windows
 			// 
 			// label14
 			// 
-			this.label14.Location = new System.Drawing.Point(13, 330);
+			this.label14.Location = new System.Drawing.Point(13, 350);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(151, 23);
 			this.label14.TabIndex = 26;
@@ -366,7 +368,7 @@ namespace Session_windows
 			// 
 			// txtMaxWorkingSet
 			// 
-			this.txtMaxWorkingSet.Location = new System.Drawing.Point(170, 350);
+			this.txtMaxWorkingSet.Location = new System.Drawing.Point(170, 370);
 			this.txtMaxWorkingSet.Name = "txtMaxWorkingSet";
 			this.txtMaxWorkingSet.ReadOnly = true;
 			this.txtMaxWorkingSet.Size = new System.Drawing.Size(281, 20);
@@ -374,7 +376,7 @@ namespace Session_windows
 			// 
 			// label15
 			// 
-			this.label15.Location = new System.Drawing.Point(13, 353);
+			this.label15.Location = new System.Drawing.Point(13, 373);
 			this.label15.Name = "label15";
 			this.label15.Size = new System.Drawing.Size(151, 23);
 			this.label15.TabIndex = 28;
@@ -382,7 +384,7 @@ namespace Session_windows
 			// 
 			// txtMinWorkingSet
 			// 
-			this.txtMinWorkingSet.Location = new System.Drawing.Point(170, 373);
+			this.txtMinWorkingSet.Location = new System.Drawing.Point(170, 393);
 			this.txtMinWorkingSet.Name = "txtMinWorkingSet";
 			this.txtMinWorkingSet.ReadOnly = true;
 			this.txtMinWorkingSet.Size = new System.Drawing.Size(281, 20);
@@ -390,7 +392,7 @@ namespace Session_windows
 			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(13, 376);
+			this.label16.Location = new System.Drawing.Point(13, 396);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(151, 23);
 			this.label16.TabIndex = 30;
@@ -398,7 +400,7 @@ namespace Session_windows
 			// 
 			// txtWorkingSet
 			// 
-			this.txtWorkingSet.Location = new System.Drawing.Point(170, 396);
+			this.txtWorkingSet.Location = new System.Drawing.Point(170, 416);
 			this.txtWorkingSet.Name = "txtWorkingSet";
 			this.txtWorkingSet.ReadOnly = true;
 			this.txtWorkingSet.Size = new System.Drawing.Size(281, 20);
@@ -406,7 +408,7 @@ namespace Session_windows
 			// 
 			// label17
 			// 
-			this.label17.Location = new System.Drawing.Point(13, 399);
+			this.label17.Location = new System.Drawing.Point(13, 419);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(151, 23);
 			this.label17.TabIndex = 32;
@@ -414,7 +416,7 @@ namespace Session_windows
 			// 
 			// txtNonPagedMemorySize
 			// 
-			this.txtNonPagedMemorySize.Location = new System.Drawing.Point(170, 419);
+			this.txtNonPagedMemorySize.Location = new System.Drawing.Point(170, 439);
 			this.txtNonPagedMemorySize.Name = "txtNonPagedMemorySize";
 			this.txtNonPagedMemorySize.ReadOnly = true;
 			this.txtNonPagedMemorySize.Size = new System.Drawing.Size(281, 20);
@@ -422,7 +424,7 @@ namespace Session_windows
 			// 
 			// label18
 			// 
-			this.label18.Location = new System.Drawing.Point(13, 422);
+			this.label18.Location = new System.Drawing.Point(13, 442);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(151, 23);
 			this.label18.TabIndex = 34;
@@ -430,7 +432,7 @@ namespace Session_windows
 			// 
 			// txtPagedMemorySize
 			// 
-			this.txtPagedMemorySize.Location = new System.Drawing.Point(170, 442);
+			this.txtPagedMemorySize.Location = new System.Drawing.Point(170, 462);
 			this.txtPagedMemorySize.Name = "txtPagedMemorySize";
 			this.txtPagedMemorySize.ReadOnly = true;
 			this.txtPagedMemorySize.Size = new System.Drawing.Size(281, 20);
@@ -438,7 +440,7 @@ namespace Session_windows
 			// 
 			// label19
 			// 
-			this.label19.Location = new System.Drawing.Point(13, 445);
+			this.label19.Location = new System.Drawing.Point(13, 465);
 			this.label19.Name = "label19";
 			this.label19.Size = new System.Drawing.Size(151, 23);
 			this.label19.TabIndex = 36;
@@ -446,7 +448,7 @@ namespace Session_windows
 			// 
 			// txtPeakPagedMemorySize
 			// 
-			this.txtPeakPagedMemorySize.Location = new System.Drawing.Point(170, 488);
+			this.txtPeakPagedMemorySize.Location = new System.Drawing.Point(170, 508);
 			this.txtPeakPagedMemorySize.Name = "txtPeakPagedMemorySize";
 			this.txtPeakPagedMemorySize.ReadOnly = true;
 			this.txtPeakPagedMemorySize.Size = new System.Drawing.Size(281, 20);
@@ -454,7 +456,7 @@ namespace Session_windows
 			// 
 			// label20
 			// 
-			this.label20.Location = new System.Drawing.Point(13, 491);
+			this.label20.Location = new System.Drawing.Point(13, 511);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(151, 23);
 			this.label20.TabIndex = 38;
@@ -462,7 +464,7 @@ namespace Session_windows
 			// 
 			// txtPeakVirtualMemorySize
 			// 
-			this.txtPeakVirtualMemorySize.Location = new System.Drawing.Point(170, 511);
+			this.txtPeakVirtualMemorySize.Location = new System.Drawing.Point(170, 531);
 			this.txtPeakVirtualMemorySize.Name = "txtPeakVirtualMemorySize";
 			this.txtPeakVirtualMemorySize.ReadOnly = true;
 			this.txtPeakVirtualMemorySize.Size = new System.Drawing.Size(281, 20);
@@ -470,7 +472,7 @@ namespace Session_windows
 			// 
 			// label21
 			// 
-			this.label21.Location = new System.Drawing.Point(13, 514);
+			this.label21.Location = new System.Drawing.Point(13, 534);
 			this.label21.Name = "label21";
 			this.label21.Size = new System.Drawing.Size(151, 23);
 			this.label21.TabIndex = 40;
@@ -478,7 +480,7 @@ namespace Session_windows
 			// 
 			// txtPeakWorkingSet
 			// 
-			this.txtPeakWorkingSet.Location = new System.Drawing.Point(170, 534);
+			this.txtPeakWorkingSet.Location = new System.Drawing.Point(170, 554);
 			this.txtPeakWorkingSet.Name = "txtPeakWorkingSet";
 			this.txtPeakWorkingSet.ReadOnly = true;
 			this.txtPeakWorkingSet.Size = new System.Drawing.Size(281, 20);
@@ -486,7 +488,7 @@ namespace Session_windows
 			// 
 			// label22
 			// 
-			this.label22.Location = new System.Drawing.Point(13, 537);
+			this.label22.Location = new System.Drawing.Point(13, 557);
 			this.label22.Name = "label22";
 			this.label22.Size = new System.Drawing.Size(151, 23);
 			this.label22.TabIndex = 42;
@@ -494,7 +496,7 @@ namespace Session_windows
 			// 
 			// txtVirtualMemorySize
 			// 
-			this.txtVirtualMemorySize.Location = new System.Drawing.Point(170, 557);
+			this.txtVirtualMemorySize.Location = new System.Drawing.Point(170, 577);
 			this.txtVirtualMemorySize.Name = "txtVirtualMemorySize";
 			this.txtVirtualMemorySize.ReadOnly = true;
 			this.txtVirtualMemorySize.Size = new System.Drawing.Size(281, 20);
@@ -502,7 +504,7 @@ namespace Session_windows
 			// 
 			// label23
 			// 
-			this.label23.Location = new System.Drawing.Point(13, 560);
+			this.label23.Location = new System.Drawing.Point(13, 580);
 			this.label23.Name = "label23";
 			this.label23.Size = new System.Drawing.Size(151, 23);
 			this.label23.TabIndex = 44;
@@ -510,7 +512,7 @@ namespace Session_windows
 			// 
 			// txtSessionID
 			// 
-			this.txtSessionID.Location = new System.Drawing.Point(170, 580);
+			this.txtSessionID.Location = new System.Drawing.Point(170, 600);
 			this.txtSessionID.Name = "txtSessionID";
 			this.txtSessionID.ReadOnly = true;
 			this.txtSessionID.Size = new System.Drawing.Size(281, 20);
@@ -518,7 +520,7 @@ namespace Session_windows
 			// 
 			// label24
 			// 
-			this.label24.Location = new System.Drawing.Point(13, 583);
+			this.label24.Location = new System.Drawing.Point(13, 603);
 			this.label24.Name = "label24";
 			this.label24.Size = new System.Drawing.Size(151, 23);
 			this.label24.TabIndex = 46;
@@ -526,7 +528,7 @@ namespace Session_windows
 			// 
 			// txtStartinfoUserName
 			// 
-			this.txtStartinfoUserName.Location = new System.Drawing.Point(170, 603);
+			this.txtStartinfoUserName.Location = new System.Drawing.Point(170, 623);
 			this.txtStartinfoUserName.Name = "txtStartinfoUserName";
 			this.txtStartinfoUserName.ReadOnly = true;
 			this.txtStartinfoUserName.Size = new System.Drawing.Size(281, 20);
@@ -534,7 +536,7 @@ namespace Session_windows
 			// 
 			// label25
 			// 
-			this.label25.Location = new System.Drawing.Point(13, 606);
+			this.label25.Location = new System.Drawing.Point(13, 626);
 			this.label25.Name = "label25";
 			this.label25.Size = new System.Drawing.Size(151, 23);
 			this.label25.TabIndex = 48;
@@ -542,7 +544,7 @@ namespace Session_windows
 			// 
 			// txtStartinfoFileName
 			// 
-			this.txtStartinfoFileName.Location = new System.Drawing.Point(170, 626);
+			this.txtStartinfoFileName.Location = new System.Drawing.Point(170, 646);
 			this.txtStartinfoFileName.Name = "txtStartinfoFileName";
 			this.txtStartinfoFileName.ReadOnly = true;
 			this.txtStartinfoFileName.Size = new System.Drawing.Size(281, 20);
@@ -550,7 +552,7 @@ namespace Session_windows
 			// 
 			// label26
 			// 
-			this.label26.Location = new System.Drawing.Point(13, 629);
+			this.label26.Location = new System.Drawing.Point(13, 649);
 			this.label26.Name = "label26";
 			this.label26.Size = new System.Drawing.Size(151, 23);
 			this.label26.TabIndex = 50;
@@ -558,7 +560,7 @@ namespace Session_windows
 			// 
 			// txtStartinfoWorkingDirectory
 			// 
-			this.txtStartinfoWorkingDirectory.Location = new System.Drawing.Point(170, 652);
+			this.txtStartinfoWorkingDirectory.Location = new System.Drawing.Point(170, 672);
 			this.txtStartinfoWorkingDirectory.Name = "txtStartinfoWorkingDirectory";
 			this.txtStartinfoWorkingDirectory.ReadOnly = true;
 			this.txtStartinfoWorkingDirectory.Size = new System.Drawing.Size(281, 20);
@@ -566,7 +568,7 @@ namespace Session_windows
 			// 
 			// label27
 			// 
-			this.label27.Location = new System.Drawing.Point(13, 655);
+			this.label27.Location = new System.Drawing.Point(13, 675);
 			this.label27.Name = "label27";
 			this.label27.Size = new System.Drawing.Size(151, 23);
 			this.label27.TabIndex = 52;
@@ -574,7 +576,7 @@ namespace Session_windows
 			// 
 			// txtThread1ID
 			// 
-			this.txtThread1ID.Location = new System.Drawing.Point(170, 675);
+			this.txtThread1ID.Location = new System.Drawing.Point(170, 695);
 			this.txtThread1ID.Name = "txtThread1ID";
 			this.txtThread1ID.ReadOnly = true;
 			this.txtThread1ID.Size = new System.Drawing.Size(281, 20);
@@ -582,7 +584,7 @@ namespace Session_windows
 			// 
 			// label28
 			// 
-			this.label28.Location = new System.Drawing.Point(13, 678);
+			this.label28.Location = new System.Drawing.Point(13, 698);
 			this.label28.Name = "label28";
 			this.label28.Size = new System.Drawing.Size(151, 23);
 			this.label28.TabIndex = 54;
@@ -590,7 +592,7 @@ namespace Session_windows
 			// 
 			// txtPagedSystemMemorySize
 			// 
-			this.txtPagedSystemMemorySize.Location = new System.Drawing.Point(170, 465);
+			this.txtPagedSystemMemorySize.Location = new System.Drawing.Point(170, 485);
 			this.txtPagedSystemMemorySize.Name = "txtPagedSystemMemorySize";
 			this.txtPagedSystemMemorySize.ReadOnly = true;
 			this.txtPagedSystemMemorySize.Size = new System.Drawing.Size(281, 20);
@@ -598,7 +600,7 @@ namespace Session_windows
 			// 
 			// label29
 			// 
-			this.label29.Location = new System.Drawing.Point(13, 468);
+			this.label29.Location = new System.Drawing.Point(13, 488);
 			this.label29.Name = "label29";
 			this.label29.Size = new System.Drawing.Size(151, 23);
 			this.label29.TabIndex = 56;
@@ -645,13 +647,31 @@ namespace Session_windows
 			this.label32.TabIndex = 62;
 			this.label32.Text = "Y";
 			// 
+			// txtTimeRunning
+			// 
+			this.txtTimeRunning.Location = new System.Drawing.Point(170, 252);
+			this.txtTimeRunning.Name = "txtTimeRunning";
+			this.txtTimeRunning.ReadOnly = true;
+			this.txtTimeRunning.Size = new System.Drawing.Size(281, 20);
+			this.txtTimeRunning.TabIndex = 64;
+			// 
+			// label8
+			// 
+			this.label8.Location = new System.Drawing.Point(13, 255);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(151, 23);
+			this.label8.TabIndex = 63;
+			this.label8.Text = "Time running";
+			// 
 			// WindowInfo
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-			this.ClientSize = new System.Drawing.Size(464, 741);
+			this.ClientSize = new System.Drawing.Size(464, 746);
+			this.Controls.Add(this.txtTimeRunning);
+			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label32);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.label31);
@@ -726,5 +746,8 @@ namespace Session_windows
 			this.PerformLayout();
 
 		}
+
+		private System.Windows.Forms.TextBox txtTimeRunning;
+		private System.Windows.Forms.Label label8;
 	}
 }

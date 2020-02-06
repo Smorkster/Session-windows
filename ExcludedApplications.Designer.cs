@@ -47,30 +47,33 @@ namespace Session_windows
 			this.btnCancel.TabIndex = 0;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+			this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
 			// 
 			// btnSave
 			// 
+			this.btnSave.Enabled = false;
 			this.btnSave.Location = new System.Drawing.Point(93, 217);
 			this.btnSave.Name = "btnSave";
 			this.btnSave.Size = new System.Drawing.Size(75, 23);
 			this.btnSave.TabIndex = 1;
 			this.btnSave.Text = "Save";
 			this.btnSave.UseVisualStyleBackColor = true;
-			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+			this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
 			// 
 			// btnRemove
 			// 
+			this.btnRemove.Enabled = false;
 			this.btnRemove.Location = new System.Drawing.Point(12, 217);
 			this.btnRemove.Name = "btnRemove";
 			this.btnRemove.Size = new System.Drawing.Size(75, 23);
 			this.btnRemove.TabIndex = 3;
 			this.btnRemove.Text = "Remove";
 			this.btnRemove.UseVisualStyleBackColor = true;
-			this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+			this.btnRemove.Click += new System.EventHandler(this.BtnRemove_Click);
 			// 
 			// lvAppList
 			// 
+			this.lvAppList.FullRowSelect = true;
 			this.lvAppList.Location = new System.Drawing.Point(12, 12);
 			this.lvAppList.MultiSelect = false;
 			this.lvAppList.Name = "lvAppList";
@@ -78,6 +81,7 @@ namespace Session_windows
 			this.lvAppList.TabIndex = 4;
 			this.lvAppList.UseCompatibleStateImageBehavior = false;
 			this.lvAppList.View = System.Windows.Forms.View.List;
+			this.lvAppList.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LvAppList_MouseDown);
 			// 
 			// ExcludedApplications
 			// 
@@ -89,7 +93,9 @@ namespace Session_windows
 			this.Controls.Add(this.btnRemove);
 			this.Controls.Add(this.btnSave);
 			this.Controls.Add(this.btnCancel);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Name = "ExcludedApplications";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "ExcludedApplications";
 			this.ResumeLayout(false);
 

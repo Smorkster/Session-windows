@@ -10,97 +10,88 @@ namespace Session_windows
 	/// </summary>
 	public class Session
 	{
-		List<ProcessInfo> plist;
-		string sessionName;
-		bool taskbarVisible;
+		/// <summary>
+		/// Timeout, in seconds, for the ballontip when session is applied
+		/// </summary>
+		readonly int balloonTipTimeout = 5;
 
-		[DllImport("user32.dll", CharSet = CharSet.Auto)]
-		public static extern IntPtr FindWindow(string strClassName, string strWindowName);
+		/// <summary>
+		/// Retrieves a handle to the top-level window whose class name and window name match the specified strings
+		/// </summary>
+		/// <param name="strClassName">Class name or a class atom created by a previous call to the RegisterClass or RegisterClassEx function</param>
+		/// <param name="strWindowName">Window name</param>
+		/// <returns>Handle to the window that has the specified class name and window name</returns>
+		[DllImport("user32.dll", CharSet = CharSet.Unicode)]
+		internal static extern IntPtr FindWindow(string strClassName, string strWindowName);
 
+		/// <summary>
+		/// Sends an appbar message to the system
+		/// </summary>
+		/// <param name="dwMessage">Appbar message value to send (see https://docs.microsoft.com/en-us/windows/win32/api/shellapi/nf-shellapi-shappbarmessage)</param>
+		/// <param name="pData">Pointer to an APPBARDATA structure</param>
+		/// <returns>A message-dependent value</returns>
 		[DllImport("shell32.dll")]
-		public static extern UInt32 SHAppBarMessage(UInt32 dwMessage, ref APPBARDATA pData);
+		internal static extern uint SHAppBarMessage(uint dwMessage, ref APPBARDATA pData);
 
-		public enum AppBarMessages
-		{
-		    New              = 0x00,
-		    Remove           = 0x01,
-		    QueryPos         = 0x02,
-		    SetPos           = 0x03,
-		    GetState         = 0x04,
-		    GetTaskBarPos    = 0x05,
-		    Activate         = 0x06,
-		    GetAutoHideBar   = 0x07,
-		    SetAutoHideBar   = 0x08,
-		    WindowPosChanged = 0x09,
-		    SetState         = 0x0a
-		}
-
+		/// <summary>
+		/// Information about a system appbar message
+		/// </summary>
 		[StructLayout(LayoutKind.Sequential)]
-		public struct APPBARDATA
+		internal struct APPBARDATA : IDisposable
 		{
-		    public UInt32 cbSize;
-		    public IntPtr hWnd;
-		    public UInt32 uCallbackMessage;
-		    public UInt32 uEdge;
-		    public Rectangle rc;
-		    public Int32 lParam;
+			internal uint cbSize;
+			internal IntPtr hWnd;
+			internal uint uCallbackMessage;
+			internal uint uEdge;
+			Rectangle rc;
+			internal int lParam;
+			public void Dispose() { }
 		}
 
-		public enum AppBarStates
-		{
-		    AutoHide    = 0x01,
-		    AlwaysOnTop = 0x02
-		}
-
-		public Session(){}
+		internal Session() { }
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		/// <param name="n">Name of session</param>
+		/// <param name="name">Name of session</param>
 		/// <param name="l">List of processes in session</param>
-		public Session(string n, List<ProcessInfo> l)
+		internal Session(string name, List<ProcessInfo> l)
 		{
-			plist = l;
-			sessionName = n;
+			SessionName = name;
+			Plist = l;
+			TaskbarVisible = true;
 		}
 
 		/// <summary>
-		/// Contructor
+		/// Name of this session
 		/// </summary>
-		/// <param name="s">Session to be used</param>
-		public Session(Session s)
-		{
-			plist = s.Plist;
-			sessionName = s.SessionName;
-		}
-
-		public string SessionName { get { return sessionName; } set { sessionName = value; } }
-		public List<ProcessInfo> Plist { get { return plist; } set { plist = value; } }
-		public bool TaskbarVisible { get { return taskbarVisible; }  set { taskbarVisible = value;}}
-
+		internal string SessionName { get; set; }
 		/// <summary>
-		/// Set the Taskbar State option
+		/// List of processes, with their location and size information, saved in this session
 		/// </summary>
-		/// <param name="option">AppBarState to activate</param>
-		static void setTaskbarState(AppBarStates option)
-		{
-		    APPBARDATA msgData = new APPBARDATA();
-		    msgData.cbSize = (UInt32)Marshal.SizeOf(msgData);
-			msgData.hWnd = FindWindow("System_TrayWnd", null);
-			if (msgData.hWnd == IntPtr.Zero)
-			    msgData.hWnd = FindWindow("Shell_TrayWnd", null);
-			msgData.lParam = (Int32)(option);
-		    SHAppBarMessage((UInt32)AppBarMessages.SetState, ref msgData);
-		}
+		internal List<ProcessInfo> Plist { get; set; }
+		/// <summary>
+		/// Bool for if the taskbar is to be visible when this session is active
+		/// </summary>
+		internal bool TaskbarVisible { get; set; }
 
 		/// <summary>
 		/// Adds a process to the session
 		/// </summary>
 		/// <param name="process"></param>
-		public void addProcessToSession(ProcessInfo process)
+		internal void AddProcessToSession(ProcessInfo process)
 		{
-			plist.Add(process);
+			Plist.Add(process);
+		}
+
+		/// <summary>
+		/// Deletes a process from the processlist
+		/// </summary>
+		/// <param name="process">Processname</param>
+		internal void DeleteProcessFromSession(ProcessInfo process)
+		{
+			int processIndex = Plist.FindIndex(x => x.ProcessID == process.ProcessID);
+			Plist.RemoveAt(processIndex);
 		}
 
 		/// <summary>
@@ -108,46 +99,93 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="processName">Name of process to return</param>
 		/// <returns>Returns the process in the session with same name</returns>
-		public ProcessInfo getProcess(string processName)
+		internal ProcessInfo GetProcess(string processName)
 		{
-			return plist.Find(x => x.ProcessName.Equals(processName));
+			return new ProcessInfo(Plist.Find(x => x.ProcessName.Equals(processName)));
 		}
 
 		/// <summary>
-		/// Deletes a process from the processlist
+		/// Return a windowhandle for the windows of each process in plist
 		/// </summary>
-		/// <param name="process">Processname</param>
-		public void deleteProcessFromSession(ProcessInfo process)
+		/// <returns>Array of windowhandles</returns>
+		internal List<IntPtr> GetWindowHandles()
 		{
-			int processIndex = plist.FindIndex(x => x.ProcessID == process.ProcessID);
-			plist.RemoveAt(processIndex);
+			List<IntPtr> handles = new List<IntPtr>();
+
+			if (SessionName.Equals("current"))
+			{
+				return null;
+			}
+			else
+			{
+				foreach (ProcessInfo pi in Plist)
+				{
+					if (pi.MainWindowHandle != IntPtr.Zero && pi.ProcessID != 0)
+
+						handles.Add(pi.MainWindowHandle);
+				}
+				return handles;
+			}
+		}
+
+		/// <summary>
+		/// Set the Windows taskbar to AutoHide or AlwaysOnTop
+		/// </summary>
+		void SetTaskbarState()
+		{
+			APPBARDATA msgData = new APPBARDATA();
+			msgData.cbSize = (uint)Marshal.SizeOf(msgData);
+			if ((msgData.hWnd = FindWindow("Shell_TrayWnd", null)) == IntPtr.Zero)
+				msgData.hWnd = FindWindow("System_TrayWnd", null);
+
+			if (TaskbarVisible)
+				msgData.lParam = 0x02;
+			else
+				msgData.lParam = 0x01;
+			SHAppBarMessage(0x0a, ref msgData);
+
 		}
 
 		/// <summary>
 		/// Updates the information about the process
 		/// </summary>
 		/// <param name="process">An object containing the new information</param>
-		public void updateProcess(ProcessInfo process)
+		internal void UpdateProcess(ProcessInfo process)
 		{
-			int processIndex = plist.FindIndex(x => x.ProcessName.Equals(process.ProcessName));
-			plist[processIndex] = process;
+			int processIndex = Plist.FindIndex(x => x.ProcessName.Equals(process.ProcessName));
+			Plist[processIndex] = process;
 		}
 
 		/// <summary>
 		/// Apply saved settings for the session and taskbar
 		/// </summary>
-		public void useSession()
+		internal void UseSession()
 		{
-			foreach(ProcessInfo info in Plist)
+			foreach (ProcessInfo info in Plist)
 			{
-				new WindowLayout().setLayout(info);
+				new WindowLayout().SetLayout(info);
 			}
 
-			if (taskbarVisible)
-				setTaskbarState(AppBarStates.AlwaysOnTop);
-			else
-				setTaskbarState(AppBarStates.AutoHide);
-			Program.icon.ShowBalloonTip(8, "Session windows", "Session '" + sessionName + "' is now loaded", System.Windows.Forms.ToolTipIcon.Info);
+			SetTaskbarState();
+			ApplicationControls.trayicon.ShowBalloonTip(balloonTipTimeout, "Session windows", "Session '" + SessionName + "' is now loaded", System.Windows.Forms.ToolTipIcon.Info);
+			ApplicationControls.trayicon.Text = "Session '" + SessionName + "' loaded";
+		}
+
+		/// <summary>
+		/// Apply saved settings for the session and taskbar
+		/// Apply the settings for windows by reversed z-order
+		/// </summary>
+		/// <param name="handles">List of KeyValuePairs with handles of open windows that have saved settings in this session</param>
+		internal void UseSession(List<KeyValuePair<IntPtr, int>> handles)
+		{
+			foreach (KeyValuePair<IntPtr, int> item in handles)
+			{
+				new WindowLayout().SetLayout(Plist.Find(p => p.MainWindowHandle.Equals(item.Key)));
+			}
+
+			SetTaskbarState();
+			ApplicationControls.trayicon.ShowBalloonTip(balloonTipTimeout, "Session windows", "Session '" + SessionName + "' is now loaded", System.Windows.Forms.ToolTipIcon.Info);
+			ApplicationControls.trayicon.Text = "Session '" + SessionName + "' loaded";
 		}
 	}
 }

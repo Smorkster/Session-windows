@@ -32,9 +32,11 @@ namespace Session_windows
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.btnSave = new System.Windows.Forms.Button();
 			this.btnCancel = new System.Windows.Forms.Button();
 			this.txtSessionName = new System.Windows.Forms.TextBox();
+			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			this.SuspendLayout();
 			// 
 			// btnSave
@@ -45,7 +47,7 @@ namespace Session_windows
 			this.btnSave.TabIndex = 0;
 			this.btnSave.Text = "Save";
 			this.btnSave.UseVisualStyleBackColor = true;
-			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+			this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
 			// 
 			// btnCancel
 			// 
@@ -55,7 +57,7 @@ namespace Session_windows
 			this.btnCancel.TabIndex = 1;
 			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
-			this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+			this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
 			// 
 			// txtSessionName
 			// 
@@ -65,7 +67,8 @@ namespace Session_windows
 			this.txtSessionName.Name = "txtSessionName";
 			this.txtSessionName.Size = new System.Drawing.Size(249, 20);
 			this.txtSessionName.TabIndex = 2;
-			this.txtSessionName.TextChanged += new System.EventHandler(this.txtSessionName_TextChanged);
+			this.txtSessionName.TextChanged += new System.EventHandler(this.TxtSessionName_TextChanged);
+			this.txtSessionName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtSessionName_KeyDown);
 			// 
 			// NewSessionName
 			// 
@@ -84,5 +87,7 @@ namespace Session_windows
 			this.PerformLayout();
 
 		}
+
+		private System.Windows.Forms.ToolTip toolTip1;
 	}
 }

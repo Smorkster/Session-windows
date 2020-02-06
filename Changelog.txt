@@ -1,4 +1,22 @@
-﻿Version 3.1
+﻿Version 4.0
+***********
+Handling of filefunctions is now centralized by functioncall to settings-object
+Total rework of XML-file
+Rework of how settings is handled
+Added a new class for variables
+Adding some minor memorymanagement
+checkboxTaskbar is now only enabled when a session is loaded
+Excluded applications are now sorted alphabeticaly when shown in list
+Mainform is now properly shown after having been hidden after minimize
+New function to get the saved processes in z-order, the order is then used when settings windowlayouts
+Now uses application properties for Test, ActiveSession and SettingsFile as global variables
+SettingsFile is now saved to "My Documents" by default
+If MainForm is shown, it will now load the currently active session if changed from trayicon
+Implemented single instance functionality
+Now properly shows form when brought up from minimized
+Closing form now minimizes to tray
+
+Version 3.1
 ***********
 Closing the mainform, now properly closes application
 btnGetRunningProcesses is now always enabled

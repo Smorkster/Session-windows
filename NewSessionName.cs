@@ -5,16 +5,11 @@ namespace Session_windows
 {
 	public partial class NewSessionName : Form
 	{
-		public NewSessionName(string[] sessionNames)
+		public NewSessionName(AutoCompleteStringCollection sessionNames)
 		{
 			InitializeComponent();
 			ActiveControl = txtSessionName;
-			AutoCompleteStringCollection autocomplete = new AutoCompleteStringCollection();
-			foreach (string name in sessionNames)
-			{
-				autocomplete.Add(name);
-			}
-			txtSessionName.AutoCompleteCustomSource = autocomplete;
+			txtSessionName.AutoCompleteCustomSource = sessionNames;
 		}
 
 		/// <summary>
@@ -22,7 +17,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnSave_Click(object sender, EventArgs e)
+		void BtnSave_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.OK;
 			Close();
@@ -33,7 +28,7 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void btnCancel_Click(object sender, EventArgs e)
+		void BtnCancel_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.Cancel;
 			Close();
@@ -47,11 +42,16 @@ namespace Session_windows
 		/// <param name="e">Generic FormClosingEvent</param>
 		void SessionName_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (txtSessionName.Text.Length == 0) {
-				DialogResult a = MessageBox.Show("No name of session.\nDo you want to cancel saving?", "No name", MessageBoxButtons.YesNo);
-				if (a == DialogResult.Yes) {
-					DialogResult = DialogResult.Cancel;
-					e.Cancel = false;
+			if (DialogResult == DialogResult.OK)
+			{
+				if (txtSessionName.Text.Length == 0)
+				{
+					DialogResult a = MessageBox.Show("No name of session.\nDo you want to cancel saving?", "No name", MessageBoxButtons.YesNo);
+					if (a == DialogResult.Yes)
+					{
+						DialogResult = DialogResult.Cancel;
+						e.Cancel = false;
+					}
 				}
 			}
 		}
@@ -60,7 +60,7 @@ namespace Session_windows
 		/// Used for getting the name the user have entered
 		/// </summary>
 		/// <returns>The name of the session</returns>
-		public string getName()
+		public string GetName()
 		{
 			return txtSessionName.Text;
 		}
@@ -71,11 +71,26 @@ namespace Session_windows
 		/// </summary>
 		/// <param name="sender">Generic object</param>
 		/// <param name="e">Generic EventArgs</param>
-		void txtSessionName_TextChanged(object sender, EventArgs e)
+		void TxtSessionName_TextChanged(object sender, EventArgs e)
 		{
 			if (txtSessionName.AutoCompleteCustomSource.Contains(txtSessionName.Text))
 			{
 				btnSave.Enabled = false;
+				toolTip1.Show("Illegal name. Can't be same as other session.", txtSessionName);
+			}
+			else if (txtSessionName.Text.Contains("Current"))
+			{
+				btnSave.Enabled = false;
+				toolTip1.Show("Illegal name. 'Current' is reserved for application.", txtSessionName);
+			}
+		}
+
+		void TxtSessionName_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyData == Keys.Enter)
+			{
+				DialogResult = DialogResult.OK;
+				Close();
 			}
 		}
 	}
