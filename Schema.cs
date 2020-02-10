@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -6,7 +7,7 @@ namespace Session_windows
 {
 	internal class Schema
 	{
-		static string x = @"<?xml version='1.0' encoding='Windows-1252'?>
+		static readonly string x = @"<?xml version='1.0' encoding='Windows-1252'?>
 		<xs:schema attributeFormDefault='unqualified' elementFormDefault='qualified' xmlns:xs='http://www.w3.org/2001/XMLSchema'>
 		  <xs:element name='sessions'>
 			<xs:complexType>
@@ -51,6 +52,7 @@ namespace Session_windows
 		{
 			XmlSchemaSet set = new XmlSchemaSet();
 			set.Add("", XmlReader.Create(new StringReader(x)));
+			
 			return set;
 		}
 	}
