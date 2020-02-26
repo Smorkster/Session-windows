@@ -12,6 +12,19 @@ namespace Session_windows
 	internal partial class WindowInfo : Form
 	{
 		/// <summary>
+		/// Placement of window
+		/// </summary>
+		NativeMethods.WINDOWPLACEMENT placement;
+		/// <summary>
+		/// Timer for updateinterval of textboxes
+		/// </summary>
+		Timer timer;
+		/// <summary>
+		/// Process-object
+		/// </summary>
+		Process process;
+
+		/// <summary>
 		/// Enumeration of available windowcommands for WINDOWPLACEMENT
 		/// </summary>
 		internal enum ShowWindowCommands
@@ -45,10 +58,6 @@ namespace Session_windows
 			public Point ptMaxPosition;
 			public Rectangle rcNormalPosition;
 		}
-
-		NativeMethods.WINDOWPLACEMENT placement;
-		Timer timer;
-		Process process;
 
 		/// <summary>
 		/// Construct
@@ -102,6 +111,7 @@ namespace Session_windows
 			ActiveControl = txtProcessName;
 		}
 
+		#region Operational methods
 		/// <summary>
 		/// Gets the window placementstyle, size and position 
 		/// </summary>
@@ -193,18 +203,9 @@ namespace Session_windows
 			}
 			return r;
 		}
+		#endregion
 
-		/// <summary>
-		/// Catches if the Escape-key is pressed, then close the form
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic KeyEventArgs</param>
-		void WindowInfo_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.KeyCode.Equals(Keys.Escape))
-				Close();
-		}
-
+		#region Event methods
 		/// <summary>
 		/// Timeintervall for timer have looped
 		/// Update textboxes at each tick
@@ -234,5 +235,17 @@ namespace Session_windows
 			timer.Dispose();
 			Dispose();
 		}
+
+		/// <summary>
+		/// Catches if the Escape-key is pressed, then close the form
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic KeyEventArgs</param>
+		void WindowInfo_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode.Equals(Keys.Escape))
+				Close();
+		}
+		#endregion
 	}
 }

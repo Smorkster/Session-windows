@@ -98,7 +98,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="NativeMethods.cs" />
-    <Compile Include="ProcessInfo.cs" />
+    <Compile Include="Models\ProcessInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -110,14 +110,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Include="Schema.cs" />
-    <Compile Include="SelectSession.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SelectSession.Designer.cs">
-      <DependentUpon>SelectSession.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Session.cs" />
+    <Compile Include="Models\Schema.cs" />
+    <Compile Include="Models\Session.cs" />
     <Compile Include="NewSessionName.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,11 +119,6 @@
       <DependentUpon>NewSessionName.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="Settings1.cs" />
-    <Compile Include="TestForm.cs" />
-    <Compile Include="TestForm.Designer.cs">
-      <DependentUpon>TestForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="WindowInfo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -157,14 +146,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectSession.resx">
-      <DependentUpon>SelectSession.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="NewSessionName.resx">
       <DependentUpon>NewSessionName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TestForm.resx">
-      <DependentUpon>TestForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WindowInfo.resx">
       <DependentUpon>WindowInfo.cs</DependentUpon>

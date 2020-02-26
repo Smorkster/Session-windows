@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Session_windows.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -47,7 +48,7 @@ namespace Session_windows
 
 			Text = $"Session window version {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
 			if (settings.Test)
-				Text = Text + " [In testmode]";
+				Text += " [In testmode]";
 		}
 
 		/// <summary>
@@ -84,18 +85,7 @@ namespace Session_windows
 			}
 		}
 
-		/// <summary>
-		/// Eventhandler for activewindows-menu
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		/// <param name="i">ProcessID of window to show info about</param>
-		static void ActiveWindow_EventHandler(object sender, EventArgs e, int processId)
-		{
-			WindowInfo wi = new WindowInfo(processId);
-			wi.Show();
-		}
-
+		#region Operational methods
 		/// <summary>
 		/// Add the chosen process to current session
 		/// </summary>
@@ -396,23 +386,6 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// Session in menu have been clicked
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		void SessionMenu_EventHandler(object sender, EventArgs e)
-		{
-			if ((sender as ToolStripMenuItem).Text.Contains("Current"))
-			{
-				settings.ActiveSession = "current";
-			}
-			else
-			{
-				settings.ActiveSession = (sender as ToolStripMenuItem).Text;
-			}
-		}
-
-		/// <summary>
 		/// Shows form if it is minimized
 		/// If form is not minimized, bring to front
 		/// </summary>
@@ -426,17 +399,39 @@ namespace Session_windows
 			Activate();
 		}
 
+		#endregion
+
+		#region Event methods
 		/// <summary>
-		/// Handle systemwide windowmessages
+		/// Eventhandler for activewindows-menu
 		/// </summary>
-		/// <param name="m">Message</param>
-		protected override void WndProc(ref Message m)
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		/// <param name="i">ProcessID of window to show info about</param>
+		static void ActiveWindow_EventHandler(int processId)
 		{
-			if (m.Msg == NativeMethods.WM_SHOWME)
+			WindowInfo wi = new WindowInfo(processId);
+			wi.Show();
+		}
+
+		/// <summary>
+		/// Clear list of processes, clear boxes of info and collect info for the active session
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="ea">Generic EventArgs</param>
+		void BtnAddRunningProcess_Click(object sender, EventArgs ea)
+		{
+			conmsActiveWindows.Items.Clear();
+
+			foreach (ProcessInfo pInfo in GetListOfRunningProcesses())
 			{
-				ShowForm();
+				if (settings.GetSession(settings.ActiveSession).Plist.Find(x => x.ProcessName.Equals(pInfo.ProcessName)) == null)
+				{
+					string windowTitle = pInfo.MainWindowTitle.Equals("") ? "Process: " + pInfo.ProcessName : "Process: " + pInfo.ProcessName;
+					conmsActiveWindows.Items.Add(new ToolStripMenuItem(windowTitle, null, (s, e) => AddProcess(pInfo)));
+				}
 			}
-			base.WndProc(ref m);
+			conmsActiveWindows.Show(btnAddRunningProcess, 0, 18);
 		}
 
 		/// <summary>
@@ -543,26 +538,6 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// Clear list of processes, clear boxes of info and collect info for the active session
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="ea">Generic EventArgs</param>
-		void BtnAddRunningProcess_Click(object sender, EventArgs ea)
-		{
-			conmsActiveWindows.Items.Clear();
-
-			foreach (ProcessInfo pInfo in GetListOfRunningProcesses())
-			{
-				if (settings.GetSession(settings.ActiveSession).Plist.Find(x => x.ProcessName.Equals(pInfo.ProcessName)) == null)
-				{
-					string windowTitle = pInfo.MainWindowTitle.Equals("") ? "Process: " + pInfo.ProcessName : "Process: " + pInfo.ProcessName;
-					conmsActiveWindows.Items.Add(new ToolStripMenuItem(windowTitle, null, (s, e) => AddProcess(pInfo)));
-				}
-			}
-			conmsActiveWindows.Show(btnAddRunningProcess, 0, 18);
-		}
-
-		/// <summary>
 		/// Open a contextmenu, displaying all saved sessions, for loading a session
 		/// </summary>
 		/// <param name="sender">Generic object</param>
@@ -588,40 +563,6 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// Information for a process is to be saved to session
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		void BtnUpdateProcess_Click(object sender, EventArgs e)
-		{
-			markedProcess.Height = int.Parse(txtHeight.Text);
-			markedProcess.Width = int.Parse(txtWidth.Text);
-			markedProcess.ProcessName = txtProcess.Text;
-			markedProcess.XTopCoordinate = int.Parse(txtX.Text);
-			markedProcess.YTopCoordinate = int.Parse(txtY.Text);
-			markedProcess.WindowPlacement = comboboxWindowPlacement.SelectedIndex + 1;
-
-			ProcessInfo tempProcess = new ProcessInfo(Process.GetProcessById(markedProcess.ProcessID).MainWindowHandle,
-										  markedProcess.ProcessID,
-										  markedProcess.ProcessName,
-										  markedProcess.XTopCoordinate,
-										  markedProcess.YTopCoordinate,
-										  markedProcess.Width,
-										  markedProcess.Height,
-										  markedProcess.WindowPlacement);
-			if (settings.ActiveSession.Equals("current"))
-			{
-				settings.currentlyRunningProcesses.UpdateProcess(tempProcess);
-			}
-			else
-			{
-				settings.GetSession(settings.ActiveSession).UpdateProcess(tempProcess);
-			}
-			btnUpdateProcess.Enabled = false;
-			btnUpdateSettings.Enabled = true;
-		}
-
-		/// <summary>
 		/// Remove the process from session
 		/// </summary>
 		/// <param name="sender">Generic object</param>
@@ -629,17 +570,6 @@ namespace Session_windows
 		void BtnRemoveProcess_Click(object sender, EventArgs e)
 		{
 			DeleteProcess(null, null);
-		}
-
-		/// <summary>
-		/// Information about a process have been updated, save to session and file
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		void BtnUpdateSettings_Click(object sender, EventArgs e)
-		{
-			settings.SaveToFile();
-			btnUpdateSettings.Enabled = false;
 		}
 
 		/// <summary>
@@ -678,6 +608,51 @@ namespace Session_windows
 		}
 
 		/// <summary>
+		/// Information for a process is to be saved to session
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void BtnUpdateProcess_Click(object sender, EventArgs e)
+		{
+			markedProcess.Height = int.Parse(txtHeight.Text);
+			markedProcess.Width = int.Parse(txtWidth.Text);
+			markedProcess.ProcessName = txtProcess.Text;
+			markedProcess.XTopCoordinate = int.Parse(txtX.Text);
+			markedProcess.YTopCoordinate = int.Parse(txtY.Text);
+			markedProcess.WindowPlacement = comboboxWindowPlacement.SelectedIndex + 1;
+
+			ProcessInfo tempProcess = new ProcessInfo(Process.GetProcessById(markedProcess.ProcessID).MainWindowHandle,
+										  markedProcess.ProcessID,
+										  markedProcess.ProcessName,
+										  markedProcess.XTopCoordinate,
+										  markedProcess.YTopCoordinate,
+										  markedProcess.Width,
+										  markedProcess.Height,
+										  markedProcess.WindowPlacement);
+			if (settings.ActiveSession.Equals("current"))
+			{
+				settings.currentlyRunningProcesses.UpdateProcess(tempProcess);
+			}
+			else
+			{
+				settings.GetSession(settings.ActiveSession).UpdateProcess(tempProcess);
+			}
+			btnUpdateProcess.Enabled = false;
+			btnUpdateSettings.Enabled = true;
+		}
+
+		/// <summary>
+		/// Information about a process have been updated, save to session and file
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void BtnUpdateSettings_Click(object sender, EventArgs e)
+		{
+			settings.SaveToFile();
+			btnUpdateSettings.Enabled = false;
+		}
+
+		/// <summary>
 		/// Open a menu with active windows
 		/// Clicking on an item, opens a window with information about the process and window
 		/// </summary>
@@ -690,7 +665,7 @@ namespace Session_windows
 			List<ProcessInfo> listProcesses = GetListOfRunningProcesses();
 			foreach (ProcessInfo pInfo in listProcesses)
 			{
-				conmsActiveWindows.Items.Add(pInfo.ProcessName + " (ProcessId: " + pInfo.ProcessID + ")", null, (s, e) => ActiveWindow_EventHandler(s, e, pInfo.ProcessID));
+				conmsActiveWindows.Items.Add(pInfo.ProcessName + " (ProcessId: " + pInfo.ProcessID + ")", null, (s, e) => ActiveWindow_EventHandler(pInfo.ProcessID));
 			}
 			conmsActiveWindows.Show(btnWinInfo, 0, 18);
 		}
@@ -902,6 +877,23 @@ namespace Session_windows
 		}
 
 		/// <summary>
+		/// Session in menu have been clicked
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void SessionMenu_EventHandler(object sender, EventArgs e)
+		{
+			if ((sender as ToolStripMenuItem).Text.Contains("Current"))
+			{
+				settings.ActiveSession = "current";
+			}
+			else
+			{
+				settings.ActiveSession = (sender as ToolStripMenuItem).Text;
+			}
+		}
+
+		/// <summary>
 		/// Tooltip shown for textbox for coordinates when mouse is hovering
 		/// </summary>
 		/// <param name="sender">Generic object</param>
@@ -1058,5 +1050,19 @@ namespace Session_windows
 				btnUpdateProcess.Enabled = true;
 			}
 		}
+
+		/// <summary>
+		/// Handle systemwide windowmessages
+		/// </summary>
+		/// <param name="m">Message</param>
+		protected override void WndProc(ref Message m)
+		{
+			if (m.Msg == NativeMethods.WM_SHOWME)
+			{
+				ShowForm();
+			}
+			base.WndProc(ref m);
+		}
+		#endregion
 	}
 }

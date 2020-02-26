@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using Session_windows.Models;
 
 namespace Session_windows
 {
 	class Program
 	{
-		static Mutex mutex = new Mutex(true, "SW");
+		static readonly Mutex mutex = new Mutex(true, "SW");
 		[STAThread]
 		static void Main()
 		{
 			// Use mutex to check if application is already running. If so, bring form to front
 			if (mutex.WaitOne(TimeSpan.Zero, true))
 			{
-				Properties.Settings.Default.Test = false;
+				Properties.Settings.Default.Test = true;
 				Properties.Settings.Default.SettingsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\WindowSession.xml";
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
@@ -44,13 +44,6 @@ namespace Session_windows
 		/// </summary>
 		static int currentScreenWidth = Screen.AllScreens.Length;
 		/// <summary>
-		/// Delegate to filter which windows to include
-		/// </summary>
-		/// <param name="hWnd">Generic IntPtr</param>
-		/// <param name="lParam">Generic IntPtr</param>
-		/// <returns>True to continue enumeration, false to stop</returns>
-		delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-		/// <summary>
 		/// A formobject for the mainwindow
 		/// </summary>
 		Form mainform = null;
@@ -62,6 +55,13 @@ namespace Session_windows
 		/// Trayicon-object
 		/// </summary>
 		internal static NotifyIcon trayicon;
+		/// <summary>
+		/// Delegate to filter which windows to include
+		/// </summary>
+		/// <param name="hWnd">Generic IntPtr</param>
+		/// <param name="lParam">Generic IntPtr</param>
+		/// <returns>True to continue enumeration, false to stop</returns>
+		delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
 		internal ApplicationControls()
 		{
@@ -79,12 +79,6 @@ namespace Session_windows
 
 			settings = new FileHandler().Read();
 
-			if (settings.Test)
-			{
-				trayicon.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Application is in testmode") { BackColor = Color.Red, ForeColor = Color.White });
-				trayicon.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Test", null, MenuTestItem_Click));
-				trayicon.ContextMenuStrip.Items.Add("-");
-			}
 			if (settings.GetNumberOfSessions() > 0)
 			{
 				ToolStripMenuItem sessionsMenu = new ToolStripMenuItem("Apply session...");
@@ -126,12 +120,10 @@ namespace Session_windows
 		/// </summary>
 		void IDisposable.Dispose()
 		{
-			Dispose(true);
+			Dispose();
 		}
 
-		void Dispose(bool disposing)
-		{
-		}
+		void Dispose() { }
 
 		/// <summary>
 		/// Enumerate open windows and return their z-order
@@ -246,16 +238,6 @@ namespace Session_windows
 		void Trayicon_DoubleClick(object sender, EventArgs e)
 		{
 			ShowForm();
-		}
-
-		/// <summary>
-		/// Menuitem for testing have been clicked
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		static void MenuTestItem_Click(object sender, EventArgs e)
-		{
-			new TestForm().ShowDialog();
 		}
 	}
 }

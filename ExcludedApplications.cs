@@ -25,6 +25,29 @@ namespace Session_windows
 			this.appList.AddRange(appList);
 		}
 
+		#region Operational methods
+		/// <summary>
+		/// Get applist
+		/// </summary>
+		/// <returns>The list of applications to exclude</returns>
+		internal List<string> GetExcludedApplications()
+		{
+			return appList;
+		}
+
+		#endregion
+
+		#region Event methods
+		/// <summary>
+		/// User wants to cancel editing the applist
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void BtnCancel_Click(object sender, EventArgs e)
+		{
+			Close();
+		}
+
 		/// <summary>
 		/// Remove the application marked in lvAppList
 		/// </summary>
@@ -52,25 +75,6 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// User wants to cancel editing the applist
-		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		void BtnCancel_Click(object sender, EventArgs e)
-		{
-			Close();
-		}
-
-		/// <summary>
-		/// Get applist
-		/// </summary>
-		/// <returns>The list of applications to exclude</returns>
-		internal List<string> GetExcludedApplications()
-		{
-			return appList;
-		}
-
-		/// <summary>
 		/// A click has occured on the listview
 		/// Check if item is located at click
 		/// If yes, enable button for removal
@@ -91,5 +95,6 @@ namespace Session_windows
 				btnRemove.Enabled = true;
 			}
 		}
+		#endregion
 	}
 }

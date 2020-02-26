@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Session_windows
+namespace Session_windows.Models
 {
 	/// <summary>
 	/// Description of Process.
@@ -10,42 +10,34 @@ namespace Session_windows
 	internal class ProcessInfo
 	{
 		/// <summary>
-		/// Unique id of the process
+		/// Height of the mainwindow
 		/// </summary>
-		internal int ProcessID { get; set; }
+		internal int Height { get; set; }
 		/// <summary>
 		/// Handle of the mainwindow for the process
 		/// </summary>
 		internal IntPtr MainWindowHandle { get; set; }
 		/// <summary>
-		/// X-coordinate of the topleft corner of the mainwindow
+		/// Title of the mainwindow
 		/// </summary>
-		internal int XTopCoordinate { get; set; }
+		internal string MainWindowTitle { get; set; }
 		/// <summary>
-		/// Y-coordinate of the topleft corner of the mainwindow
+		/// Unique id of the process
 		/// </summary>
-		internal int YTopCoordinate { get; set; }
-		/// <summary>
-		/// Height of the mainwindow
-		/// </summary>
-		internal int Height { get; set; }
-		/// <summary>
-		/// Width of the mainwindow
-		/// </summary>
-		internal int Width { get; set; }
+		internal int ProcessID { get; set; }
 		/// <summary>
 		/// Name of the process
 		/// </summary>
 		internal string ProcessName { get; set; }
 		/// <summary>
+		/// Width of the mainwindow
+		/// </summary>
+		internal int Width { get; set; }
+		/// <summary>
 		/// Windowplacement of the mainwindow
 		/// This is represented by an int that is interpreted with showCmd in windowplacement-enumeration
 		/// </summary>
 		internal int WindowPlacement { get; set; }
-		/// <summary>
-		/// Title of the mainwindow
-		/// </summary>
-		internal string MainWindowTitle { get; set; }
 		/// <summary>
 		/// X-coordinate of the bottomright corner
 		/// </summary>
@@ -54,6 +46,14 @@ namespace Session_windows
 		/// Y-coordinate of the bottomright corner
 		/// </summary>
 		readonly int YBottomCoordinate;
+		/// <summary>
+		/// X-coordinate of the topleft corner of the mainwindow
+		/// </summary>
+		internal int XTopCoordinate { get; set; }
+		/// <summary>
+		/// Y-coordinate of the topleft corner of the mainwindow
+		/// </summary>
+		internal int YTopCoordinate { get; set; }
 
 		internal ProcessInfo() { }
 
@@ -87,6 +87,22 @@ namespace Session_windows
 		}
 
 		/// <summary>
+		/// Create a ProcessInfo-object from a temporary ProcessInfo-object
+		/// </summary>
+		/// <param name="p"></param>
+		internal ProcessInfo(ProcessInfo p)
+		{
+			ProcessID = p.ProcessID;
+			MainWindowHandle = p.MainWindowHandle;
+			ProcessName = p.ProcessName;
+			XTopCoordinate = p.XTopCoordinate;
+			YTopCoordinate = p.YTopCoordinate;
+			Height = p.Height;
+			Width = p.Width;
+			WindowPlacement = p.WindowPlacement;
+		}
+
+		/// <summary>
 		/// Construct to create an object with all needed information
 		/// </summary>
 		/// <param name="mainwindowhandle">Handle of the mainwindow</param>
@@ -107,22 +123,6 @@ namespace Session_windows
 			Height = height;
 			Width = width;
 			WindowPlacement = placement;
-		}
-
-		/// <summary>
-		/// Create a ProcessInfo-object from a temporary ProcessInfo-object
-		/// </summary>
-		/// <param name="p"></param>
-		internal ProcessInfo(ProcessInfo p)
-		{
-			ProcessID = p.ProcessID;
-			MainWindowHandle = p.MainWindowHandle;
-			ProcessName = p.ProcessName;
-			XTopCoordinate = p.XTopCoordinate;
-			YTopCoordinate = p.YTopCoordinate;
-			Height = p.Height;
-			Width = p.Width;
-			WindowPlacement = p.WindowPlacement;
 		}
 	}
 }

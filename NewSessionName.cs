@@ -12,17 +12,18 @@ namespace Session_windows
 			txtSessionName.AutoCompleteCustomSource = sessionNames;
 		}
 
+		#region Operational methods
 		/// <summary>
-		/// Name is given, button to save session is pressed
+		/// Used for getting the name the user have entered
 		/// </summary>
-		/// <param name="sender">Generic object</param>
-		/// <param name="e">Generic EventArgs</param>
-		void BtnSave_Click(object sender, EventArgs e)
+		/// <returns>The name of the session</returns>
+		public string GetName()
 		{
-			DialogResult = DialogResult.OK;
-			Close();
+			return txtSessionName.Text;
 		}
+		#endregion
 
+		#region Event methods
 		/// <summary>
 		/// Button to cancel naming the session was pressed
 		/// </summary>
@@ -31,6 +32,17 @@ namespace Session_windows
 		void BtnCancel_Click(object sender, EventArgs e)
 		{
 			DialogResult = DialogResult.Cancel;
+			Close();
+		}
+
+		/// <summary>
+		/// Name is given, button to save session is pressed
+		/// </summary>
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic EventArgs</param>
+		void BtnSave_Click(object sender, EventArgs e)
+		{
+			DialogResult = DialogResult.OK;
 			Close();
 		}
 
@@ -57,12 +69,17 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// Used for getting the name the user have entered
+		/// Catch if Enter is pressed
 		/// </summary>
-		/// <returns>The name of the session</returns>
-		public string GetName()
+		/// <param name="sender">Generic object</param>
+		/// <param name="e">Generic KeyEventArgs</param>
+		void TxtSessionName_KeyDown(object sender, KeyEventArgs e)
 		{
-			return txtSessionName.Text;
+			if (e.KeyData == Keys.Enter)
+			{
+				DialogResult = DialogResult.OK;
+				Close();
+			}
 		}
 
 		/// <summary>
@@ -84,14 +101,6 @@ namespace Session_windows
 				toolTip1.Show("Illegal name. 'Current' is reserved for application.", txtSessionName);
 			}
 		}
-
-		void TxtSessionName_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.KeyData == Keys.Enter)
-			{
-				DialogResult = DialogResult.OK;
-				Close();
-			}
-		}
+		#endregion
 	}
 }

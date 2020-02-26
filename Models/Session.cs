@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Session_windows
+namespace Session_windows.Models
 {
 	/// <summary>
 	/// Description of Session.

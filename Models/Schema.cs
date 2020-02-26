@@ -1,9 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Session_windows
+namespace Session_windows.Models
 {
 	internal class Schema
 	{
