@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Session_windows
+namespace Session_windows.Library
 {
 	internal static class NativeMethods
 	{
@@ -145,5 +147,40 @@ namespace Session_windows
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool SetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+		/// <summary>
+		/// Enumerate open windows and return their z-order
+		/// </summary>
+		/// <param name="windowHandles">Filter for open windows</param>
+		/// <returns>Z-ordered KeyValuePair-list [handle, z-index] of windows, ordered in decending z-order</returns>
+		static List<KeyValuePair<IntPtr, int>> EnumerateWindows(List<IntPtr> windowHandles)
+		{
+			List<KeyValuePair<IntPtr, int>> z = new List<KeyValuePair<IntPtr, int>>();
+			List<IntPtr> listOfOpenWindows = new List<IntPtr>();
+
+			List<int> t = new List<int>();
+			var numRemaining = windowHandles.Count;
+			NativeMethods.EnumWindows((wnd, param) =>
+			{
+				listOfOpenWindows.Add(wnd);
+				return true;
+			}, IntPtr.Zero);
+
+			foreach (IntPtr handle in windowHandles)
+			{
+				int index = listOfOpenWindows.IndexOf(handle);
+				z.Add(new KeyValuePair<IntPtr, int>(handle, index));
+			}
+			return z.OrderByDescending(x => x.Value).ToList();
+		}
+
+		/// <summary>
+		/// List processes, saved in a sessions, sorted in z-order
+		/// </summary>
+		/// <returns>KeyValuePair list of z-ordered handles</returns>
+		public static List<KeyValuePair<IntPtr, int>> GetWindowsZorder(this List<IntPtr> handles)
+		{
+			return EnumerateWindows(handles);
+		}
 	}
 }

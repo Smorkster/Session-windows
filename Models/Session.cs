@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Session_windows.Library;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Session_windows.Models
@@ -118,11 +121,10 @@ namespace Session_windows.Models
 			}
 			else
 			{
-				foreach (ProcessInfo pi in Plist)
+				foreach (ProcessInfo pInfo in Plist)
 				{
-					if (pi.MainWindowHandle != IntPtr.Zero && pi.ProcessID != 0)
-
-						handles.Add(pi.MainWindowHandle);
+					pInfo.UpdateMainWindowHandle();
+					handles.Add(pInfo.MainWindowHandle);
 				}
 				return handles;
 			}
@@ -158,29 +160,14 @@ namespace Session_windows.Models
 
 		/// <summary>
 		/// Apply saved settings for the session and taskbar
-		/// </summary>
-		internal void UseSession()
-		{
-			foreach (ProcessInfo info in Plist)
-			{
-				new WindowLayout().SetLayout(info);
-			}
-
-			SetTaskbarState();
-			ApplicationControls.trayicon.ShowBalloonTip(balloonTipTimeout, "Session windows", "Session '" + SessionName + "' is now loaded", System.Windows.Forms.ToolTipIcon.Info);
-			ApplicationControls.trayicon.Text = "Session '" + SessionName + "' loaded";
-		}
-
-		/// <summary>
-		/// Apply saved settings for the session and taskbar
 		/// Apply the settings for windows by reversed z-order
 		/// </summary>
 		/// <param name="handles">List of KeyValuePairs with handles of open windows that have saved settings in this session</param>
-		internal void UseSession(List<KeyValuePair<IntPtr, int>> handles)
+		internal void UseSession()
 		{
-			foreach (KeyValuePair<IntPtr, int> item in handles)
+			foreach (KeyValuePair<IntPtr, int> handle in GetWindowHandles().GetWindowsZorder())
 			{
-				new WindowLayout().SetLayout(Plist.Find(p => p.MainWindowHandle.Equals(item.Key)));
+				WindowLayout.SetLayout(Plist.Find(p => p.MainWindowHandle.Equals(handle.Key)));
 			}
 
 			SetTaskbarState();

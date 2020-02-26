@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Session_windows.Models
@@ -123,6 +124,18 @@ namespace Session_windows.Models
 			Height = height;
 			Width = width;
 			WindowPlacement = placement;
+		}
+
+		/// <summary>
+		/// Updates the MainWindowHandle for this ProcessInfo
+		/// </summary>
+		internal void UpdateMainWindowHandle()
+		{
+			Process[] pList = Process.GetProcessesByName(ProcessName);
+			if (pList.Length > 0)
+			{
+				MainWindowHandle = pList.Where(x => x.MainWindowHandle != IntPtr.Zero).First().MainWindowHandle;
+			}
 		}
 	}
 }

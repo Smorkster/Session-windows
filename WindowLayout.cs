@@ -1,6 +1,8 @@
-﻿using Session_windows.Models;
+﻿using Session_windows.Library;
+using Session_windows.Models;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -9,14 +11,14 @@ namespace Session_windows
 	/// <summary>
 	/// Class for setting the layout of a windowform 
 	/// </summary>
-	public class WindowLayout
+	public static class WindowLayout
 	{
 		/// <summary>
 		/// Is there an open window with provided handle
 		/// </summary>
 		/// <param name="handle">Windowhandle to verify if window is open</param>
 		/// <returns>True if window is open, else false</returns>
-		static bool GetOpenWindows(IntPtr handle)
+		static bool IsOpenWindow(IntPtr handle)
 		{
 			IntPtr open = IntPtr.Zero;
 
@@ -38,7 +40,7 @@ namespace Session_windows
 		/// apply the settings from the processinfo
 		/// </summary>
 		/// <param name="pInfo">Information of how the window is to be shown</param>
-		internal void SetLayout(ProcessInfo pInfo)
+		internal static void SetLayout(ProcessInfo pInfo)
 		{
 			try
 			{

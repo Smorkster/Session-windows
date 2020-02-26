@@ -90,15 +90,6 @@ namespace Session_windows
 		}
 
 		/// <summary>
-		/// Applies the settings for the currently active session
-		/// The settings is applied in order of system z-order
-		/// </summary>
-		internal void ApplyActiveSession(List<KeyValuePair<IntPtr, int>> handles)
-		{
-			GetSession(Properties.Settings.Default.ActiveSession).UseSession(handles);
-		}
-
-		/// <summary>
 		/// Deletes a session from the settings
 		/// </summary>
 		/// <param name="sessionName">Session to delete</param>

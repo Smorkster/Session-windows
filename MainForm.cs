@@ -1,4 +1,5 @@
-﻿using Session_windows.Models;
+﻿using Session_windows.Library;
+using Session_windows.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +24,7 @@ namespace Session_windows
 		/// <summary>
 		/// Object containing all settings and sessions
 		/// </summary>
-		Settings settings;
+		readonly Settings settings;
 
 		/// <summary>
 		/// Fill listbox of sessions from data in the XML-file
@@ -604,7 +605,7 @@ namespace Session_windows
 			}
 
 			if (markedProcess.ProcessID != 0)
-				new WindowLayout().SetLayout(tempProcess);
+				WindowLayout.SetLayout(tempProcess);
 		}
 
 		/// <summary>

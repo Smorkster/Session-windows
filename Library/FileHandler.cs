@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Schema;
 
-namespace Session_windows
+namespace Session_windows.Library
 {
 	/// <summary>
 	/// Object for filehandling, i.e. writing and reading

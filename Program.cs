@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using Session_windows.Library;
 using Session_windows.Models;
 
 namespace Session_windows
@@ -126,47 +127,6 @@ namespace Session_windows
 		void Dispose() { }
 
 		/// <summary>
-		/// Enumerate open windows and return their z-order
-		/// </summary>
-		/// <param name="windowHandles">Filter for open windows</param>
-		/// <returns>Z-ordered KeyValuePair-list [handle, z-index] of windows, ordered in decending z-order</returns>
-		List<KeyValuePair<IntPtr, int>> EnumerateWindows(List<IntPtr> windowHandles)
-		{
-			List<KeyValuePair<IntPtr, int>> z = new List<KeyValuePair<IntPtr, int>>();
-			List<IntPtr> listOfOpenWindows = new List<IntPtr>();
-
-			List<int> t = new List<int>();
-			var numRemaining = windowHandles.Count;
-			NativeMethods.EnumWindows((wnd, param) =>
-			{
-				listOfOpenWindows.Add(wnd);
-				return true;
-			}, IntPtr.Zero);
-
-			foreach (IntPtr handle in windowHandles)
-			{
-				int index = listOfOpenWindows.IndexOf(handle);
-				z.Add(new KeyValuePair<IntPtr, int>(handle, index));
-			}
-			return z.OrderByDescending(x => x.Value).ToList();
-		}
-
-		/// <summary>
-		/// List processes, saved in a sessions, sorted in z-order
-		/// </summary>
-		/// <returns>KeyValuePair list of z-ordered handles</returns>
-		List<KeyValuePair<IntPtr, int>> GetWindowsZorder()
-		{
-			if (settings.ActiveSession != null && !settings.ActiveSession.Equals("current"))
-			{
-				List<IntPtr> handles = settings.GetSession(settings.ActiveSession).GetWindowHandles();
-				List<KeyValuePair<IntPtr, int>> enumeratedWindows = EnumerateWindows(handles);
-				return enumeratedWindows;
-			}
-			return null;
-		}
-
-		/// <summary>
 		/// Close the application from systemtray
 		/// </summary>
 		/// <param name="sender"></param>
@@ -200,7 +160,7 @@ namespace Session_windows
 				else
 					settings.ActiveSession = settings.DockedSession;
 
-				settings.ApplyActiveSession(GetWindowsZorder());
+				settings.ApplyActiveSession();
 				currentScreenWidth = Screen.AllScreens.Length;
 			}
 		}
@@ -214,7 +174,7 @@ namespace Session_windows
 		void SessionSelected(object sender, EventArgs e)
 		{
 			settings.ActiveSession = (sender as ToolStripMenuItem).Text;
-			settings.ApplyActiveSession(GetWindowsZorder());
+			settings.ApplyActiveSession();
 		}
 
 		/// <summary>
