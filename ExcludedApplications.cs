@@ -6,7 +6,7 @@ namespace Session_windows
 {
 	public partial class ExcludedApplications : Form
 	{
-		List<string> appList = new List<string>();
+		readonly List<string> appList = new List<string>();
 
 		public ExcludedApplications(List<string> appList)
 		{
@@ -34,7 +34,6 @@ namespace Session_windows
 		{
 			return appList;
 		}
-
 		#endregion
 
 		#region Event methods

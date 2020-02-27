@@ -2,9 +2,7 @@
 using Session_windows.Models;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace Session_windows
 {
@@ -13,27 +11,6 @@ namespace Session_windows
 	/// </summary>
 	public static class WindowLayout
 	{
-		/// <summary>
-		/// Is there an open window with provided handle
-		/// </summary>
-		/// <param name="handle">Windowhandle to verify if window is open</param>
-		/// <returns>True if window is open, else false</returns>
-		static bool IsOpenWindow(IntPtr handle)
-		{
-			IntPtr open = IntPtr.Zero;
-
-			NativeMethods.EnumWindows(delegate (IntPtr hWnd, int lParam)
-			{
-				if (hWnd == handle)
-				{ open = handle; return false; }
-				return true;
-			}, IntPtr.Zero);
-
-			if (open == IntPtr.Zero)
-				return false;
-			return true;
-		}
-
 		/// <summary>
 		/// Take the processinfo specified by the user,
 		/// find all open windows of the same processname,

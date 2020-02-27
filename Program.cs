@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -56,13 +54,6 @@ namespace Session_windows
 		/// Trayicon-object
 		/// </summary>
 		internal static NotifyIcon trayicon;
-		/// <summary>
-		/// Delegate to filter which windows to include
-		/// </summary>
-		/// <param name="hWnd">Generic IntPtr</param>
-		/// <param name="lParam">Generic IntPtr</param>
-		/// <returns>True to continue enumeration, false to stop</returns>
-		delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 
 		internal ApplicationControls()
 		{

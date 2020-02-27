@@ -938,7 +938,7 @@ namespace Session_windows
 		{
 			string newNumber = (sender as TextBox).Text;
 			char name = (sender as TextBox).Name[3];
-			if (int.TryParse(newNumber, out int number))
+			if (int.TryParse(newNumber, out _))
 			{
 				switch (name)
 				{

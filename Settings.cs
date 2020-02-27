@@ -19,7 +19,7 @@ namespace Session_windows
 		/// <summary>
 		/// A list of applications that are ignored
 		/// </summary>
-		List<string> excludedApps;
+		readonly List<string> excludedApps;
 		/// <summary>
 		/// List of saved sessions
 		/// </summary>
