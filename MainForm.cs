@@ -604,8 +604,8 @@ namespace Session_windows
 				settings.GetSession(settings.ActiveSession).UpdateProcess(tempProcess);
 			}
 
-			if (markedProcess.ProcessID != 0)
-				WindowLayout.SetLayout(tempProcess);
+			if (WindowLayout.SetLayout(tempProcess))
+				MessageBox.Show($"No process running for {tempProcess.ProcessName}", "No running process", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
 		/// <summary>

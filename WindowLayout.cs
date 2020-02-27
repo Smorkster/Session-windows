@@ -40,7 +40,7 @@ namespace Session_windows
 		/// apply the settings from the processinfo
 		/// </summary>
 		/// <param name="pInfo">Information of how the window is to be shown</param>
-		internal static void SetLayout(ProcessInfo pInfo)
+		internal static bool SetLayout(ProcessInfo pInfo)
 		{
 			try
 			{
@@ -64,10 +64,12 @@ namespace Session_windows
 				if (wp.showCmd == NativeMethods.ShowWindowCommands.SW_SHOWNORMAL)
 					NativeMethods.MoveWindow(pInfo.MainWindowHandle, pInfo.XTopCoordinate, pInfo.YTopCoordinate, pInfo.Width, pInfo.Height, true);
 			}
-			catch (ArgumentException e)
+			catch (ArgumentException)
 			{
-				MessageBox.Show("No process with id " + pInfo.ProcessID + " is running.\n" + e.Message);
+				return false;
 			}
+
+			return true;
 		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Session_windows.Library;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -73,7 +74,6 @@ namespace Session_windows.Models
 			{
 				NativeMethods.GetWindowPlacement(MainWindowHandle, ref placement);
 				WindowPlacement = (int)placement.showCmd;
-				IntPtr mainWindowHandle = MainWindowHandle;
 
 				ProcessName = p.ProcessName;
 				MainWindowTitle = p.MainWindowTitle.Equals("") ? "Process: " + p.ProcessName : p.MainWindowTitle;

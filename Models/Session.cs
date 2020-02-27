@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Session_windows.Models
 {
@@ -165,9 +166,17 @@ namespace Session_windows.Models
 		/// <param name="handles">List of KeyValuePairs with handles of open windows that have saved settings in this session</param>
 		internal void UseSession()
 		{
+			string noprocess = "";
 			foreach (KeyValuePair<IntPtr, int> handle in GetWindowHandles().GetWindowsZorder())
 			{
-				WindowLayout.SetLayout(Plist.Find(p => p.MainWindowHandle.Equals(handle.Key)));
+				ProcessInfo pInfo = Plist.Find(p => p.MainWindowHandle.Equals(handle.Key));
+				if (WindowLayout.SetLayout(pInfo) == false)
+					noprocess += $" {pInfo.ProcessName}\n";
+			}
+
+			if (noprocess.Equals("") == false)
+			{
+				MessageBox.Show($"No process found for the following applications:\n{noprocess.Trim()}");
 			}
 
 			SetTaskbarState();
