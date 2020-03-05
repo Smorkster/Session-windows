@@ -580,21 +580,28 @@ namespace Session_windows
 		/// <param name="e">Generic EventArgs</param>
 		void BtnSetProcessInfoLayout_Click(object sender, EventArgs e)
 		{
-			markedProcess.Height = int.Parse(txtHeight.Text);
-			markedProcess.Width = int.Parse(txtWidth.Text);
-			markedProcess.ProcessName = txtProcess.Text;
-			markedProcess.XTopCoordinate = int.Parse(txtX.Text);
-			markedProcess.YTopCoordinate = int.Parse(txtY.Text);
-			markedProcess.WindowPlacement = comboboxWindowPlacement.SelectedIndex + 1;
+			ProcessInfo tempProcess = new ProcessInfo();
+			try
+			{
+				tempProcess.ProcessID = markedProcess.ProcessID;
+				tempProcess.ProcessName = markedProcess.ProcessName;
+				tempProcess.XTopCoordinate = int.Parse(txtX.Text);
+				tempProcess.YTopCoordinate = int.Parse(txtY.Text);
+				tempProcess.Width = int.Parse(txtWidth.Text);
+				tempProcess.Height = int.Parse(txtHeight.Text);
+				tempProcess.WindowPlacement = comboboxWindowPlacement.SelectedIndex + 1;
+				tempProcess.MainWindowHandle = Process.GetProcessById(markedProcess.ProcessID).MainWindowHandle;
 
-			ProcessInfo tempProcess = new ProcessInfo(Process.GetProcessById(markedProcess.ProcessID).MainWindowHandle,
-										  markedProcess.ProcessID,
-										  markedProcess.ProcessName,
-										  markedProcess.XTopCoordinate,
-										  markedProcess.YTopCoordinate,
-										  markedProcess.Width,
-										  markedProcess.Height,
-										  markedProcess.WindowPlacement);
+				WindowLayout.SetLayout(tempProcess);
+			}
+			catch (ArgumentException)
+			{
+				MessageBox.Show($"No process for {markedProcess.ProcessName} is running.", "No running process", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				btnSetProcessInfoLayout.Enabled = false;
+				tempProcess.MainWindowHandle = IntPtr.Zero;
+				tempProcess.ProcessID = 0;
+			}
+
 			if (settings.ActiveSession.Equals("current"))
 			{
 				settings.currentlyRunningProcesses.UpdateProcess(tempProcess);
@@ -603,9 +610,6 @@ namespace Session_windows
 			{
 				settings.GetSession(settings.ActiveSession).UpdateProcess(tempProcess);
 			}
-
-			if (WindowLayout.SetLayout(tempProcess))
-				MessageBox.Show($"No process running for {tempProcess.ProcessName}", "No running process", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
 		/// <summary>
