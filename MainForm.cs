@@ -615,21 +615,14 @@ namespace Session_windows
 		/// <param name="e">Generic EventArgs</param>
 		void BtnUpdateProcess_Click(object sender, EventArgs e)
 		{
-			markedProcess.Height = int.Parse(txtHeight.Text);
-			markedProcess.Width = int.Parse(txtWidth.Text);
-			markedProcess.ProcessName = txtProcess.Text;
-			markedProcess.XTopCoordinate = int.Parse(txtX.Text);
-			markedProcess.YTopCoordinate = int.Parse(txtY.Text);
-			markedProcess.WindowPlacement = comboboxWindowPlacement.SelectedIndex + 1;
-
 			ProcessInfo tempProcess = new ProcessInfo(Process.GetProcessById(markedProcess.ProcessID).MainWindowHandle,
 										  markedProcess.ProcessID,
 										  markedProcess.ProcessName,
-										  markedProcess.XTopCoordinate,
-										  markedProcess.YTopCoordinate,
-										  markedProcess.Width,
-										  markedProcess.Height,
-										  markedProcess.WindowPlacement);
+										  int.Parse(txtX.Text),
+										  int.Parse(txtY.Text),
+										  int.Parse(txtWidth.Text),
+										  int.Parse(txtHeight.Text),
+										  comboboxWindowPlacement.SelectedIndex + 1);
 			if (settings.ActiveSession.Equals("current"))
 			{
 				settings.currentlyRunningProcesses.UpdateProcess(tempProcess);
